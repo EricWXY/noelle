@@ -1,0 +1,30 @@
+{
+	"files": [],
+	"references": [
+		{
+			"path": "./tsconfig.app.json"
+		},
+		{
+			"path": "./tsconfig.config.json"
+		}
+	],
+	"compilerOptions": {
+		"baseUrl": "./",
+		"paths": {
+			"@common/*": [
+				"common/*"
+			],
+			"@renderer/*": [
+				"renderer/*"
+			],
+			"@main/*": [
+				"main/*"
+			],
+			"@locales/*": [
+				"locales/*"
+			]
+		}
+	}
+}
+
+

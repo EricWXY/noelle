@@ -1,0 +1,45 @@
+import type { Ref } from 'vue';
+import { darkTheme, lightTheme, type GlobalTheme, type GlobalThemeOverrides } from 'naive-ui';
+import { useThemeMode } from './useThemeMode';
+import { usePrimaryColor  } from './usePrimaryColor';
+import { ref, computed, type ComputedRef } from 'vue';
+
+function _usePrimaryColor() {
+  const { primaryColors } = usePrimaryColor();
+  const primaryColor = computed(() => primaryColors.value?.DEFAULT ?? '#BB5BE7');
+  const primaryColorHover = computed(() => primaryColors.value?.hover ?? '#BB5BE7');
+
+  return {
+    primaryColor,
+    primaryColorHover
+  }
+}
+
+export function useNaiveTheme(): {
+  theme: Ref<GlobalTheme | null>;
+  themeOverrides: ComputedRef<GlobalThemeOverrides>;
+} {
+  const theme = ref<GlobalTheme | null>(null);
+  const { onThemeChange, isDark } = useThemeMode();
+  const { primaryColor, primaryColorHover } = _usePrimaryColor();
+
+  const themeOverrides: ComputedRef<GlobalThemeOverrides> = computed(() => ({
+    common: {
+      primaryColor: primaryColor.value,
+      primaryColorHover: primaryColorHover.value
+    },
+  }))
+
+  window.api.isDarkTheme().then(res => {
+    theme.value = res ? darkTheme : lightTheme;
+  })
+  
+  onThemeChange(() => theme.value = isDark.value ? darkTheme : lightTheme);
+
+  return {
+    theme,
+    themeOverrides
+  };
+}
+
+export default useNaiveTheme;
