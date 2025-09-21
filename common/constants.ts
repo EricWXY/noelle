@@ -68,6 +68,7 @@ export enum CONFIG_KEYS {
   FONT_SIZE = 'fontSize',
   MINIMIZE_TO_TRAY = 'minimizeToTray',
   PROVIDER = 'provider',
+  DEFAULT_MODEL = 'defaultModel',
 }
 
 export const MAIN_WIN_SIZE = {

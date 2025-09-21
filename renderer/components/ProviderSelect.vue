@@ -6,22 +6,12 @@ import { useI18n } from 'vue-i18n';
 
 defineOptions({ name: 'ProviderSelect' });
 
-const props = defineProps<{
-  modelValue: SelectValue
-}>()
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: SelectValue): void
-}>()
-
 const { t } = useI18n();
 const providersStore = useProvidersStore();
 
-const selectedProvider = computed({
-  get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value),
-})
+const selectedProvider = defineModel<SelectValue>('modelValue');
 
-const providerOptions = computed(() => providersStore.allProviders.map(item => ({
+const providerOptions = computed(() => providersStore.allProviders.filter(item => item.visible).map(item => ({
   label: item.title || item.name,
   type: 'group',
   key: item.id,
@@ -29,7 +19,7 @@ const providerOptions = computed(() => providersStore.allProviders.map(item => (
     label: model,
     value: `${item.id}:${model}`,
   }))
-})))
+})));
 </script>
 
 <template>

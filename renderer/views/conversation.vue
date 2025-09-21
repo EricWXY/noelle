@@ -4,6 +4,7 @@ import { MAIN_WIN_SIZE } from '@common/constants';
 import { throttle } from '@common/utils';
 import { useMessagesStore } from '@renderer/stores/messages';
 import { useConversationsStore } from '@renderer/stores/conversations';
+import { useConfig } from '@renderer/hooks/useConfig';
 import { logoData } from '@renderer/logoBase64'
 
 import ResizeDivider from '@renderer/components/ResizeDivider.vue';
@@ -17,20 +18,28 @@ const listHeight = ref(0);
 const listScale = ref(0.7);
 const maxListHeight = ref(window.innerHeight * 0.7);
 const message = ref('');
-const provider = ref<SelectValue>()
+const provider = ref<SelectValue>();
+// const defaultModel
 const msgInputRef = useTemplateRef<{ selectedProvider: SelectValue }>('msgInputRef');
 
-const { t } = useI18n();
+const config = useConfig();
 
+const { t } = useI18n();
 
 const providerId = computed(() => ((provider.value as string)?.split(':')[0]) ?? '');
 const selectedModel = computed(() => ((provider.value as string)?.split(':')[1]) ?? '');
 const conversationId = computed(() => Number(route.params.id) as number | undefined);
+const defaultModel = computed(() => config.defaultModel || void 0);
+
+const messageInputStatus = computed(() => {
+  const messages = messagesStore.messagesByConversationId(conversationId.value ?? -1);
+  const lastMessage = messages[messages.length - 1];
+  if (lastMessage.status === 'loading' || lastMessage.status === 'streaming') return lastMessage.status
+  return 'normal';
+})
 
 const messagesStore = useMessagesStore();
 const conversationsStore = useConversationsStore();
-
-
 
 function afterCreateConversation(id: number | void, firstMsg: string) {
   if (!id) return;
@@ -54,6 +63,7 @@ function handleProviderSelect() {
   }, canUpdateConversationTime.value)
 }
 
+
 async function sendMessage() {
   if (!conversationId.value) return;
   await messagesStore.sendMessage({
@@ -62,6 +72,11 @@ async function sendMessage() {
     conversationId: conversationId.value,
   });
   message.value = '';
+}
+
+function handleStopMessage() {
+  const msgIds = messagesStore.loadingMsgIdsByConversationId(conversationId.value ?? -1);
+  msgIds.forEach(id => messagesStore.stopMessage(id));
 }
 
 window.onresize = throttle(async () => {
@@ -80,12 +95,16 @@ onMounted(async () => {
   messagesStore.initialize();
 })
 
+watch(() => defaultModel.value, (val) => {
+  if (val) provider.value = val
+}, { once: true })
+
 watch(() => listHeight.value, () => {
   listScale.value = listHeight.value / window.innerHeight;
 })
 watch([() => conversationId.value, () => msgInputRef.value], async ([id, msgInput]) => {
   if (!msgInput || !id) {
-    provider.value = void 0;
+    provider.value = defaultModel.value;
     return;
   };
   const current = conversationsStore.getConversationById(id);
@@ -96,6 +115,7 @@ watch([() => conversationId.value, () => msgInputRef.value], async ([id, msgInpu
   await nextTick()
   canUpdateConversationTime.value = true;
 })
+
 </script>
 <template>
   <div class="h-full" v-if="!conversationId">
@@ -121,7 +141,8 @@ watch([() => conversationId.value, () => msgInputRef.value], async ([id, msgInpu
     <div class="input-container bg-bubble-others flex-auto w-[calc(100% + 10px)] ml-[-5px] ">
       <resize-divider direction="horizontal" v-model:size="listHeight" :max-size="maxListHeight" :min-size="100" />
       <message-input class="p-2 pt-0" ref="msgInputRef" v-model:message="message" v-model:provider="provider"
-        :placeholder="t('main.conversation.placeholder')" @send="sendMessage" @select="handleProviderSelect" />
+        :placeholder="t('main.conversation.placeholder')" :status="messageInputStatus" @send="sendMessage"
+        @stop="handleStopMessage" @select="handleProviderSelect" />
     </div>
   </div>
 </template>

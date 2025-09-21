@@ -1,41 +1,55 @@
 import Dexie, { type EntityTable } from 'dexie';
 import type { Provider, Conversation, Message } from './types';
-// import { providers } from './testData';
-
 
 export const providers: Provider[] = [
   {
     id: 1,
-    name: 'qianfan',
-    title: '百度千帆',
-    description: '百度千帆大模型平台，提供文心一言系列大模型服务，支持多场景智能交互、内容生成与知识问答。',
-    models: ['ERNIE-4.0-8K', 'ERNIE-3.5-8K', 'ERNIE-Speed-128K'],
-    avatar: 'https://aip-static.cdn.bcebos.com/landing/product/ernie-bote321e5.png',
-    createdAt: new Date('2023-03-01').getTime(),
-    updatedAt: new Date('2024-07-15').getTime()
+    name: 'bigmodel',
+    title: '智谱AI',
+    models: ['glm-4.5-flash'],
+    openAISetting: {
+      baseURL: 'https://open.bigmodel.cn/api/paas/v4',
+      apiKey: '',
+    },
+    createdAt: new Date().getTime(),
+    updatedAt: new Date().getTime()
   },
   {
     id: 2,
-    name: 'dashscope',
-    title: '阿里灵积',
-    description: '阿里云灵积平台，提供通义千问系列大模型服务，具备强大的中文理解能力和多模态生成能力。',
-    // https://help.aliyun.com/zh/dashscope/developer-reference/api-details?spm=a2c4g.11186623.0.0.5bf41507xgULX5#b148acc634pfc
-    models: ['qwen-turbo', 'qwen-plus', 'qwen-max', 'qwen-vl-plus'],
-    avatar: 'https://qph.cf2.poecdn.net/main-thumb-pb-4160791-200-qlqunomdvkyitpedtghnhsgjlutapgfl.jpeg',
-    createdAt: new Date('2023-04-15').getTime(),
-    updatedAt: new Date('2024-06-20').getTime()
+    name: 'deepseek',
+    title: '深度求索 (DeepSeek)',
+    models: ['deepseek-chat'],
+    openAISetting: {
+      baseURL: 'https://api.deepseek.com/v1',
+      apiKey: '',
+    },
+    createdAt: new Date().getTime(),
+    updatedAt: new Date().getTime()
   },
   {
     id: 3,
-    name: 'deepseek',
-    title: '深度求索 (DeepSeek)',
-    description: '深度求索提供的大模型服务，专注于代码和数学推理，在技术领域有独特优势。',
-    // https://api-docs.deepseek.com/zh-cn/
-    models: ['deepseek-chat'],
-    avatar: 'https://qph.cf2.poecdn.net/main-thumb-pb-4981273-200-phhqenmywlkiybehuaqvsxpfekviajex.jpeg',
-    createdAt: new Date('2023-06-10').getTime(),
-    updatedAt: new Date('2024-12-27').getTime()
-  }
+    name: 'siliconflow',
+    title: '硅基流动',
+    models: ['Qwen/Qwen3-8B', 'deepseek-ai/DeepSeek-R1-0528-Qwen3-8B'],
+    openAISetting: {
+      baseURL: 'https://api.siliconflow.cn/v1',
+      apiKey: '',
+    },
+    createdAt: new Date().getTime(),
+    updatedAt: new Date().getTime()
+  },
+  {
+    id: 4,
+    name: 'qianfan',
+    title: '百度千帆',
+    models: ['ernie-speed-128k', 'ernie-4.0-8k', 'ernie-3.5-8k'],
+    openAISetting: {
+      baseURL: 'https://qianfan.baidubce.com/v2',
+      apiKey: '',
+    },
+    createdAt: new Date().getTime(),
+    updatedAt: new Date().getTime()
+  },
 ];
 
 
@@ -69,7 +83,7 @@ dataBase.version(2).stores({
     }
     await tx.table('providers').put(provider);
   }
-  
+
   // 迁移 conversations 表中的时间字段
   const conversations = await tx.table('conversations').toArray();
   for (const conversation of conversations) {
@@ -81,7 +95,7 @@ dataBase.version(2).stores({
     }
     await tx.table('conversations').put(conversation);
   }
-  
+
   // 迁移 messages 表中的时间字段
   const messages = await tx.table('messages').toArray();
   for (const message of messages) {

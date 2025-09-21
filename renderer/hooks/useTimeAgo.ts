@@ -13,11 +13,160 @@ interface TimeAgoOptions {
 }
 
 /**
+ * 判断两个日期是否在同一日历周
+ * @param date1 第一个日期
+ * @param date2 第二个日期
+ * @returns 是否在同一周
+ */
+function isSameCalendarWeek(date1: Date, date2: Date): boolean {
+  // 获取两个日期所在周的第一天（周一为一周的第一天）
+  const getStartOfWeek = (date: Date): Date => {
+    const start = new Date(date);
+    const day = start.getDay(); // 0 = 周日, 1 = 周一, ..., 6 = 周六
+    
+    // 如果是周日，减去6天回到上周的周一
+    // 否则减去(day - 1)天回到本周的周一
+    const diff = start.getDate() - (day === 0 ? 6 : day - 1);
+    return new Date(start.setDate(diff));
+  };
+  
+  const startOfWeek1 = getStartOfWeek(date1);
+  const startOfWeek2 = getStartOfWeek(date2);
+  
+  // 比较两个周的起始日期是否相同
+  return startOfWeek1.toDateString() === startOfWeek2.toDateString();
+}
+
+/**
+ * 格式化仅时间部分（HH:MM）
+ * @param date 日期对象
+ * @returns 格式化后的时间字符串
+ */
+function formatTimeOnly(date: Date): string {
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  return `${hours}:${minutes}`;
+}
+
+/**
+ * 格式化月日部分
+ * @param date 日期对象
+ * @param locale 当前语言环境
+ * @returns 格式化后的月日字符串
+ */
+function formatMonthDay(date: Date, locale: string): string {
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+
+  if (locale === 'en') {
+    // 英文格式: MM/DD
+    return `${month}/${day}`;
+  } else {
+    // 中文格式: MM月DD日
+    return `${month}月${day}日`;
+  }
+}
+
+/**
+ * 格式化完整日期时间
+ * @param date 日期对象
+ * @param locale 当前语言环境
+ * @returns 格式化后的完整日期时间字符串
+ */
+function formatFullDateTime(date: Date, locale: string): string {
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  
+  if (locale === 'en') {
+    // 英文格式: MM/DD/YYYY HH:MM
+    return `${month}/${day}/${year} ${hours}:${minutes}`;
+  } else {
+    // 中文格式: YYYY年MM月DD日 HH:MM
+    return `${year}年${month}月${day}日 ${hours}:${minutes}`;
+  }
+}
+
+/**
+ * 获取星期几
+ * @param date 日期对象
+ * @param t i18n翻译函数
+ * @returns 星期几的文本
+ */
+function getWeekDay(date: Date, t: any): string {
+  const weekDays = [
+    t('timeAgo.weekday.sun'),
+    t('timeAgo.weekday.mon'),
+    t('timeAgo.weekday.tue'),
+    t('timeAgo.weekday.wed'),
+    t('timeAgo.weekday.thu'),
+    t('timeAgo.weekday.fri'),
+    t('timeAgo.weekday.sat')
+  ];
+  return weekDays[date.getDay()];
+}
+
+/**
+ * 核心时间格式化逻辑
+ * @param targetDate 目标日期
+ * @param nowDate 当前日期
+ * @param t i18n翻译函数
+ * @param locale 当前语言环境
+ * @returns 格式化后的时间字符串
+ */
+function formatTimeAgoCore(
+  targetDate: Date,
+  nowDate: Date,
+  t: any,
+  locale: string
+): string {
+  const diff = nowDate.getTime() - targetDate.getTime();
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(minutes / 60);
+  
+  // 检查是否是同一天（不考虑具体时间）
+  const isSameDay = targetDate.toDateString() === nowDate.toDateString();
+  
+  // 检查是否是同一周
+  const isSameWeek = isSameCalendarWeek(targetDate, nowDate);
+  
+  // 检查是否是同一年
+  const isSameYear = targetDate.getFullYear() === nowDate.getFullYear();
+
+  // 1. 一小时以内
+  if (hours < 1) {
+    if (minutes < 5) {
+      return t('timeAgo.justNow');
+    } else {
+      return t('timeAgo.minutes', { count: minutes });
+    }
+  }
+  // 2. 一小时到一天内且是同一天
+  else if (isSameDay) {
+    return formatTimeOnly(targetDate);
+  }
+  // 3. 一天以上一周以内且是同一周
+  else if (!isSameDay && isSameWeek) {
+    return `${getWeekDay(targetDate, t)} ${formatTimeOnly(targetDate)}`;
+  }
+  // 4. 一周以上一年以内且是同一年
+  else if (!isSameWeek && isSameYear) {
+    return `${formatMonthDay(targetDate, locale)} ${formatTimeOnly(targetDate)}`;
+  }
+  // 5. 一年以上
+  else {
+    return formatFullDateTime(targetDate, locale);
+  }
+}
+
+/**
  * 时间格式化钩子，适配项目国际化
  * 根据时间差显示不同格式的时间
  * @param timestamp 时间戳或Date对象
  * @param options 配置选项
- * @returns 格式化后的时间字符串
+ * @returns 格式化后的时间字符串及相关方法
  */
 export function useTimeAgo(timestamp: number | Date, options: TimeAgoOptions = {}) {
   const { t, locale } = useI18n();
@@ -29,102 +178,14 @@ export function useTimeAgo(timestamp: number | Date, options: TimeAgoOptions = {
   const nowDate = ref(now());
   const targetDate = ref(timestamp instanceof Date ? timestamp : new Date(timestamp));
 
-  // 计算时间差
-  const diffInMs = computed(() => {
-    if (!useNow) return 0;
-    return nowDate.value.getTime() - targetDate.value.getTime();
-  });
-
   // 根据时间差返回不同格式的时间
   const timeAgo = computed(() => {
     if (!isRelative) {
-      return formatFullDateTime(targetDate.value);
+      return formatFullDateTime(targetDate.value, locale.value);
     }
-
-    const diff = diffInMs.value;
-    const minutes = Math.floor(diff / 60000);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-    const weeks = Math.floor(days / 7);
-    const years = Math.floor(days / 365);
-
-    // 1. 一小时以内
-    if (hours < 1) {
-      if (minutes < 5) {
-        return t('timeAgo.justNow');
-      } else {
-        return t('timeAgo.minutes', { count: minutes });
-      }
-    }
-    // 2. 一小时到一天内
-    else if (days < 1) {
-      return formatTimeOnly(targetDate.value);
-    }
-    // 3. 一天以上一周以内
-    else if (weeks < 1) {
-      return `${getWeekDay(targetDate.value, t)} ${formatTimeOnly(targetDate.value)}`;
-    }
-    // 4. 一周以上一年以内
-    else if (years < 1) {
-      return `${formatMonthDay(targetDate.value)} ${formatTimeOnly(targetDate.value)}`;
-    }
-    // 5. 一年以上
-    else {
-      return formatFullDateTime(targetDate.value);
-    }
+    
+    return formatTimeAgoCore(targetDate.value, nowDate.value, t, locale.value);
   });
-
-  // 格式化仅时间部分（HH:MM）
-  function formatTimeOnly(date: Date): string {
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    return `${hours}:${minutes}`;
-  }
-
-  // 格式化月日部分
-  function formatMonthDay(date: Date): string {
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-
-    if (locale.value === 'en') {
-      // 英文格式: MM/DD
-      return `${month}/${day}`;
-    } else {
-      // 中文格式: MM月DD日
-      return `${month}月${day}日`;
-    }
-  }
-
-  // 格式化完整日期时间
-  function formatFullDateTime(date: Date): string {
-    // const locale = getCurrentLocale();
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    if (locale.value === 'en') {
-      // 英文格式: MM/DD/YYYY HH:MM
-      return `${month}/${day}/${year} ${hours}:${minutes}`;
-    } else {
-      // 中文格式: YYYY年MM月DD日 HH:MM
-      return `${year}年${month}月${day}日 ${hours}:${minutes}`;
-    }
-  }
-
-  // 获取星期几
-  function getWeekDay(date: Date, t: any): string {
-    const weekDays = [
-      t('timeAgo.weekday.sun'),
-      t('timeAgo.weekday.mon'),
-      t('timeAgo.weekday.tue'),
-      t('timeAgo.weekday.wed'),
-      t('timeAgo.weekday.thu'),
-      t('timeAgo.weekday.fri'),
-      t('timeAgo.weekday.sat')
-    ];
-    return weekDays[date.getDay()];
-  }
 
   // 定期更新时间
   let timer: number | null = null;
@@ -198,92 +259,8 @@ export function useBatchTimeAgo() {
   // 格式化单个时间戳
   const formatTimeAgo = (timestamp: number | Date): string => {
     const targetDate = timestamp instanceof Date ? timestamp : new Date(timestamp);
-    const diff = now.value.getTime() - targetDate.getTime();
-    const minutes = Math.floor(diff / 60000);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-    const weeks = Math.floor(days / 7);
-    const years = Math.floor(days / 365);
-
-    // 1. 一小时以内
-    if (hours < 1) {
-      if (minutes < 5) {
-        return t('timeAgo.justNow');
-      } else {
-        return t('timeAgo.minutes', { count: minutes });
-      }
-    }
-    // 2. 一小时到一天内
-    else if (days < 1) {
-      return formatTimeOnly(targetDate);
-    }
-    // 3. 一天以上一周以内
-    else if (weeks < 1) {
-      return `${getWeekDay(targetDate)} ${formatTimeOnly(targetDate)}`;
-    }
-    // 4. 一周以上一年以内
-    else if (years < 1) {
-      return `${formatMonthDay(targetDate)} ${formatTimeOnly(targetDate)}`;
-    }
-    // 5. 一年以上
-    else {
-      return formatFullDateTime(targetDate);
-    }
+    return formatTimeAgoCore(targetDate, now.value, t, locale.value);
   };
-
-  // 格式化仅时间部分（HH:MM）
-  function formatTimeOnly(date: Date): string {
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    return `${hours}:${minutes}`;
-  }
-
-  // 格式化月日部分
-  function formatMonthDay(date: Date): string {
-    // const locale = getCurrentLocale();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-
-    if (locale.value === 'en') {
-      // 英文格式: MM/DD
-      return `${month}/${day}`;
-    } else {
-      // 中文格式: MM月DD日
-      return `${month}月${day}日`;
-    }
-  }
-
-  // 格式化完整日期时间
-  function formatFullDateTime(date: Date): string {
-    // const locale = getCurrentLocale();
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-
-    if (locale.value === 'en') {
-      // 英文格式: MM/DD/YYYY HH:MM
-      return `${month}/${day}/${year} ${hours}:${minutes}`;
-    } else {
-      // 中文格式: YYYY年MM月DD日 HH:MM
-      return `${year}年${month}月${day}日 ${hours}:${minutes}`;
-    }
-  }
-
-  // 获取星期几
-  function getWeekDay(date: Date): string {
-    const weekDays = [
-      t('timeAgo.weekday.sun'),
-      t('timeAgo.weekday.mon'),
-      t('timeAgo.weekday.tue'),
-      t('timeAgo.weekday.wed'),
-      t('timeAgo.weekday.thu'),
-      t('timeAgo.weekday.fri'),
-      t('timeAgo.weekday.sat')
-    ];
-    return weekDays[date.getDay()];
-  }
 
   // 启动定时器
   setupTimer();

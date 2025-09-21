@@ -63,10 +63,13 @@ const batchActionPolicy = new Map([
       title: 'main.conversation.dialog.title',
       content: 'main.conversation.dialog.content_1',
     })
-    if (res === 'confirm') {
-      checkedIds.value.forEach(id => conversationsStore.delConversation(id));
-      isBatchOperate.value = false;
+    if (res !== 'confirm') return
+
+    if (checkedIds.value.includes(currentId.value)) {
+      router.push('/conversation');
     }
+    checkedIds.value.forEach(id => conversationsStore.delConversation(id));
+    isBatchOperate.value = false;
   }],
   [CONVERSATION_ITEM_MENU_IDS.PIN, () => {
     checkedIds.value.forEach(id => {

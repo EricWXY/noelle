@@ -1,7 +1,7 @@
 import type { ConfigKeys, IConfig } from '@common/types';
 import { app, BrowserWindow, ipcMain } from 'electron';
 import { CONFIG_KEYS, IPC_EVENTS } from '@common/constants';
-import { debounce } from '@common/utils';
+import { debounce, simpleCloneDeep } from '@common/utils';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -13,6 +13,7 @@ const DEFAULT_CONFIG: IConfig = {
   [CONFIG_KEYS.FONT_SIZE]: 14,
   [CONFIG_KEYS.MINIMIZE_TO_TRAY]: false,
   [CONFIG_KEYS.PROVIDER]: '',
+  [CONFIG_KEYS.DEFAULT_MODEL]: '',
 }
 
 /**
@@ -111,7 +112,7 @@ export class ConfigService {
    * @returns 当前配置对象的深拷贝
    */
   public getConfig(): IConfig {
-    return JSON.parse(JSON.stringify(this._config));
+    return simpleCloneDeep(this._config);
   }
 
   /**

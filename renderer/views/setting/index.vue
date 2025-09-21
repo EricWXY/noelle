@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { debounce } from '@common/utils';
-import { NConfigProvider, NForm, NFormItem, NDivider, NSelect, NColorPicker, NSwitch, NTabs, NTabPane, NInput, type FormInst } from 'naive-ui';
+import { NConfigProvider, NScrollbar, NForm, NFormItem, NSelect, NColorPicker, NSwitch, NTabs, NTabPane, type FormInst } from 'naive-ui';
 import { useNaiveTheme } from '@renderer/hooks/useNaiveTheme';
 import { useNaiveLocale } from '@renderer/hooks/useNaiveLocale';
 import { useFontSize } from '@renderer/hooks/useFontSize';
 import { useConfig } from '@renderer/hooks/useConfig';
 import { useI18n } from 'vue-i18n';
+
+import ProvidersConfig from './providers.vue';
 
 useFontSize();
 const { theme, themeOverrides } = useNaiveTheme();
@@ -15,15 +16,6 @@ const activeTab = ref('basic');
 
 const formModel = useConfig();
 const formRef = useTemplateRef<FormInst>('formRef');
-
-const providerFormModel = reactive({
-  qianfan: {
-    accessKey: '',
-    secretKey: ''
-  }
-})
-const providerFormRef = useTemplateRef<FormInst>('providerFormRef');
-
 
 const languageOptions = [
   { label: '中文', value: 'zh' },
@@ -47,30 +39,16 @@ const fontSizeOptions = computed(() => [
 function onWindowClose() {
   setTimeout(() => activeTab.value = 'basic', 300);
 }
-const updateProviderConfig = debounce((val) => {
-  formModel.provider = JSON.stringify(val)
-}, 300)
-
-watch(() => providerFormModel, (newVal) => updateProviderConfig(newVal), { deep: true })
-
-watchEffect(() => {
-  try {
-    const provider = JSON.parse(formModel?.provider || '{}');
-    Object.assign(providerFormModel, provider);
-  } catch (error) {
-    console.error('parse provider config failed', error);
-  }
-})
 </script>
 
 <template>
-  <n-config-provider class="bg-main text-tx-primary h-screen" :locale="locale" :date-locale="dateLocale" :theme="theme"
-    :theme-overrides="themeOverrides">
+  <n-config-provider class="bg-main text-tx-primary h-screen flex flex-col" :locale="locale" :date-locale="dateLocale"
+    :theme="theme" :theme-overrides="themeOverrides">
     <title-bar :is-maximizable="false" @close="onWindowClose">
       <drag-region class="p-2 text-[16px]">{{ t('settings.title') }}</drag-region>
     </title-bar>
-    <main class="p-4">
-      <n-tabs size="large" animated default-value="basic" v-model:value="activeTab">
+    <n-scrollbar class="p-4 h-full">
+      <n-tabs class="h-full" size="large" animated default-value="basic" v-model:value="activeTab">
         <n-tab-pane name="basic" :tab="t('settings.base')">
           <n-form ref="formRef" :model="formModel">
             <n-form-item :label="t('settings.theme.label')" path="themeMode">
@@ -95,19 +73,11 @@ watchEffect(() => {
           </n-form>
         </n-tab-pane>
         <n-tab-pane name="provider" :tab="t('settings.provider.modelConfig')">
-          <n-form ref="providerFormRef" :model="providerFormModel">
-            <h2 class="provider-from-sub-title"> 百度千帆 </h2>
-            <n-form-item label="AccessKey" path="qianfan.accessKey">
-              <n-input v-model:value="providerFormModel.qianfan.accessKey" clearable />
-            </n-form-item>
-            <n-form-item label="SecretKey" path="qianfan.secretKey">
-              <n-input v-model:value="providerFormModel.qianfan.secretKey" type="password" clearable />
-            </n-form-item>
-            <n-divider />
-          </n-form>
+          <providers-config />
         </n-tab-pane>
       </n-tabs>
-    </main>
+    </n-scrollbar>
+    <!-- </main> -->
   </n-config-provider>
 </template>
 

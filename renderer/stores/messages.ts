@@ -8,6 +8,7 @@ import { useProvidersStore } from './providers'
 import { cloneDeep } from '@common/utils';
 
 const msgContentMap = new Map<number, string>();
+export const stopMethods = new Map<number, () => void>();
 
 /**
  * Messages Store - 管理 messages 数据的响应式状态
@@ -26,6 +27,12 @@ export const useMessagesStore = defineStore('messages', () => {
       return messages.value
         .filter(message => message.conversationId === conversationId)
         .sort((a, b) => a.createdAt - b.createdAt);
+    };
+  });
+
+  const loadingMsgIdsByConversationId = computed(() => {
+    return (conversationId: number) => {
+      return messagesByConversationId.value(conversationId).filter(message => message.status === 'loading' || message.status === 'streaming').map(message => message.id)
     };
   });
 
@@ -106,12 +113,11 @@ export const useMessagesStore = defineStore('messages', () => {
         streamCallback = void 0;
       }
     }
-    listenDialogueBack(streamCallback);
+    stopMethods.set(loadingMsgId, listenDialogueBack(streamCallback));
     const messages = messagesByConversationId.value(message.conversationId).filter(item => item.status !== 'loading').map(item => ({
       role: item.type === 'question' ? 'user' : 'assistant' as DialogueMessageRole,
       content: item.content,
     }))
-
     await window.api.startADialogue({
       messageId: loadingMsgId,
       providerName: provider.name,
@@ -121,6 +127,14 @@ export const useMessagesStore = defineStore('messages', () => {
     })
 
     return loadingMsgId;
+  }
+
+  function stopMessage(id: number) {
+    const stop = stopMethods.get(id);
+    stop?.();
+    // messages.value = 
+    updateMessage(id, { status: 'success', updatedAt: Date.now() })
+    stopMethods.delete(id);
   }
 
   async function updateMessage(id: number, updates: Partial<Message>) {
@@ -149,11 +163,13 @@ export const useMessagesStore = defineStore('messages', () => {
     // 计算属性
     allMessages,
     messagesByConversationId,
+    loadingMsgIdsByConversationId,
 
     // 方法
     initialize,
     addMessage,
     deleteMessage,
     sendMessage,
+    stopMessage,
   };
 });

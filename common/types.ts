@@ -17,21 +17,6 @@ export interface IConfig {
   [CONFIG_KEYS.MINIMIZE_TO_TRAY]: boolean;
   // provider 配置 JSON
   [CONFIG_KEYS.PROVIDER]?: string;
-}
-
-interface OpenAiProviderConfig {
-  baseUrl?: string;
-  apiKey?: string;
-}
-
-interface QianfanProviderConfig {
-  accessKey?: string;
-  secretKey?: string;
-}
-
-export interface IProviderConfig {
-  dahscope?: OpenAiProviderConfig;
-  deepseek?: OpenAiProviderConfig;
-  qianfan?: QianfanProviderConfig;
-  [key: string]: any;
+  // 默认模型
+  [CONFIG_KEYS.DEFAULT_MODEL]?: string;
 }

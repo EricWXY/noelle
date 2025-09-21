@@ -111,7 +111,10 @@ export async function setupMainWindow() {
     const { providerName, messages, messageId, selectedModel } = _data
     try {
       const provider = createProvider(providerName);
-      const stream = await provider.chat(messages, selectedModel);
+      const stream = await provider?.chat(messages, selectedModel);
+      if (!stream) {
+        throw new Error('stream not found');
+      };
       for await (const data of stream) {
         mainWindow.webContents.send(IPC_EVENTS.DIALOGUE_BACK, {
           messageId,

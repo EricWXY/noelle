@@ -29,10 +29,13 @@ export interface Message {
 export interface Provider {
   id: number;
   name: string;
+  visible?: boolean;
   title?: string;
-  description?: string;
-  icon?: string;
-  avatar?: string;
+  type?: 'OpenAI';
+  openAISetting?: {
+    baseURL?: string;
+    apiKey?: string;
+  };
   createdAt: number;
   updatedAt: number;
   models: string[];

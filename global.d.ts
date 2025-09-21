@@ -71,10 +71,17 @@ interface WindowApi {
 
 
   startADialogue: (params: CreateDialogueProps) => void;
-  onDialogueBack: (cb: (data: DialogueBackStream) => void) => void;
+  onDialogueBack: (cb: (data: DialogueBackStream) => void) => () => void;
   removeDialogueBackListener: () => void;
 }
 
 declare interface Window {
   api: WindowApi;
+}
+
+interface ImportMetaEnv {
+  readonly VITE_BIGMODEL_API_KEY: string;
+}
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
 }

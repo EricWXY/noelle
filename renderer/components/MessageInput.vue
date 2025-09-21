@@ -6,16 +6,17 @@ import ProviderSelect from './ProviderSelect.vue';
 
 interface Props {
   placeholder?: string;
-  loading?: boolean;
+  status?: 'loading' | 'streaming' | 'normal';
 }
 interface Emits {
   (e: 'send', message: string): void;
   (e: 'select', provider: SelectValue): void;
+  (e: 'stop'): void;
 }
 
 defineOptions({ name: 'MessageInput' });
 
-withDefaults(defineProps<Props>(), { placeholder: '', loading: false })
+const props = withDefaults(defineProps<Props>(), { placeholder: '', status: 'normal' })
 const emit = defineEmits<Emits>();
 const message = defineModel('message', {
   type: String,
@@ -25,11 +26,16 @@ const message = defineModel('message', {
 const selectedProvider = defineModel<SelectValue>('provider');
 
 const isBtnDisabled = computed(() => {
+  if (props.status === 'loading') return true;
+  if (props.status === 'streaming') return false;
+
   if (!selectedProvider.value) return true;
   return message.value.length === 0;
 });
 
 function handleSend() {
+  if (props.status === 'streaming') return emit('stop');
+
   if (isBtnDisabled.value) return;
   emit('send', message.value);
 }
@@ -53,7 +59,9 @@ defineExpose({
       <n-button circle type="primary" :disabled="isBtnDisabled" @click="handleSend">
         <template #icon>
           <n-icon>
-            <iconify-icon class="w-4 h-4" icon="material-symbols:arrow-upward" />
+            <iconify-icon v-if="status === 'normal'" class="w-4 h-4" icon="material-symbols:arrow-upward" />
+            <iconify-icon v-else-if="status === 'streaming'" class="w-4 h-4" icon="material-symbols:pause" />
+            <iconify-icon v-else class="w-4 h-4 animate-spin" icon="mdi:loading" />
           </n-icon>
         </template>
       </n-button>

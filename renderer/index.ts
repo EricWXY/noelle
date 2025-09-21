@@ -15,9 +15,9 @@ import App from './App.vue';
 
 const components = [] as Plugin[];
 const installComponents: Plugin = function (app) {
-  components.forEach(component => {
-    app.use(component);
-  });
+  components.forEach(component =>
+    app.use(component)
+  );
   app.component('TitleBar', TitleBar)
   app.component('DragRegion', DragRegion)
 }

@@ -7,15 +7,10 @@ import { useMessagesStore } from '@renderer/stores/messages'
 import { useI18n } from 'vue-i18n';
 import { useBatchTimeAgo } from '@renderer/hooks/useTimeAgo';
 import { NCheckbox, NButton, NScrollbar } from 'naive-ui';
-import { Icon as IconifyIcon } from '@iconify/vue';
-import VueMarkdown from 'vue-markdown-render';
-
-import markdownItHighlightjs from 'markdown-it-highlightjs';
+import MarkdownRender from '@renderer/components/MarkdownRender.vue';
 
 const MESSAGE_LIST_CLASS_NAME = 'message-list' as const;
 const SCROLLBAR_CONTENT_CLASS_NAME = 'n-scrollbar-content' as const;
-
-
 
 
 defineOptions({ name: 'MessageList' })
@@ -148,17 +143,15 @@ onMounted(() => {
             </div>
             <div class="msg-shadow p-2 rounded-md bg-bubble-self text-white" v-if="message.type === 'question'"
               @contextmenu="handleContextMenu(message.id)">
-              <vue-markdown class="prose prose-slate dark:prose-invert text-inherit prose-pre:p-0 font-size-inherit"
-                style="font-size: inherit;" :source="message.content" :plugins="[markdownItHighlightjs]" />
+              <markdown-render :source="message.content" />
             </div>
             <div v-else class="msg-shadow p-2 px-6 rounded-md bg-bubble-others text-tx-primary"
               @contextmenu="handleContextMenu(message.id)">
               <template v-if="message.status === 'loading'">
-                <iconify-icon icon="mdi:loading" width="24" height="24" class="animate-spin" />
+                ...
               </template>
               <template v-else>
-                <vue-markdown class="prose dark:prose-invert prose-slate prose-pre:p-0 text-inherit font-size-inherit"
-                  :source="message.content" :plugins="[markdownItHighlightjs]" />
+                <markdown-render :source="message.content" />
               </template>
             </div>
           </span>
@@ -177,13 +170,5 @@ onMounted(() => {
 <style scoped>
 .msg-shadow {
   box-shadow: 0 0 10px var(--input-bg);
-}
-
-.font-size-inherit {
-  font-size: inherit;
-}
-
-.max-width {
-  max-width: 70%;
 }
 </style>

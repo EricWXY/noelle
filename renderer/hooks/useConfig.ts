@@ -13,6 +13,7 @@ export function useConfig() {
     [CONFIG_KEYS.FONT_SIZE]: 14,
     [CONFIG_KEYS.MINIMIZE_TO_TRAY]: false,
     [CONFIG_KEYS.PROVIDER]: '',
+    [CONFIG_KEYS.DEFAULT_MODEL]: '',
   });
 
   const configKeys = [
@@ -22,6 +23,7 @@ export function useConfig() {
     CONFIG_KEYS.FONT_SIZE,
     CONFIG_KEYS.MINIMIZE_TO_TRAY,
     CONFIG_KEYS.PROVIDER,
+    CONFIG_KEYS.DEFAULT_MODEL
   ];
 
   const setReactiveConf = (key: CONFIG_KEYS, value: IConfig[typeof key]) => config[key] = value as never;
@@ -50,7 +52,7 @@ export function useConfig() {
 
   watch(() => config, () => onReactiveChange(), { deep: true });
 
-  onUnmounted(() => window.api.removeConfigChangeListener(onReactiveChange))
+  onUnmounted(() => window.api.removeConfigChangeListener(onReactiveChange));
 
   return config;
 }
