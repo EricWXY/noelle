@@ -5,32 +5,33 @@ import { debounce } from '@common/utils';
 
 import { setLanguage, getLanguage } from '@renderer/i18n';
 
+const config: Reactive<IConfig> = reactive({
+  [CONFIG_KEYS.THEME_MODE]: 'system',
+  [CONFIG_KEYS.PRIMARY_COLOR]: '#BB5BE7',
+  [CONFIG_KEYS.LANGUAGE]: 'zh',
+  [CONFIG_KEYS.FONT_SIZE]: 14,
+  [CONFIG_KEYS.MINIMIZE_TO_TRAY]: false,
+  [CONFIG_KEYS.PROVIDER]: '',
+  [CONFIG_KEYS.DEFAULT_MODEL]: '',
+});
+
+const configKeys = [
+  CONFIG_KEYS.THEME_MODE,
+  CONFIG_KEYS.PRIMARY_COLOR,
+  CONFIG_KEYS.LANGUAGE,
+  CONFIG_KEYS.FONT_SIZE,
+  CONFIG_KEYS.MINIMIZE_TO_TRAY,
+  CONFIG_KEYS.PROVIDER,
+  CONFIG_KEYS.DEFAULT_MODEL
+];
+
+const setReactiveConf = (key: CONFIG_KEYS, value: IConfig[typeof key]) => config[key] = value as never;
+
+configKeys.forEach(key =>
+  window.api.getConfig(key).then(val => setReactiveConf(key, val))
+);
+
 export function useConfig() {
-  const config: Reactive<IConfig> = reactive({
-    [CONFIG_KEYS.THEME_MODE]: 'system',
-    [CONFIG_KEYS.PRIMARY_COLOR]: '#BB5BE7',
-    [CONFIG_KEYS.LANGUAGE]: 'zh',
-    [CONFIG_KEYS.FONT_SIZE]: 14,
-    [CONFIG_KEYS.MINIMIZE_TO_TRAY]: false,
-    [CONFIG_KEYS.PROVIDER]: '',
-    [CONFIG_KEYS.DEFAULT_MODEL]: '',
-  });
-
-  const configKeys = [
-    CONFIG_KEYS.THEME_MODE,
-    CONFIG_KEYS.PRIMARY_COLOR,
-    CONFIG_KEYS.LANGUAGE,
-    CONFIG_KEYS.FONT_SIZE,
-    CONFIG_KEYS.MINIMIZE_TO_TRAY,
-    CONFIG_KEYS.PROVIDER,
-    CONFIG_KEYS.DEFAULT_MODEL
-  ];
-
-  const setReactiveConf = (key: CONFIG_KEYS, value: IConfig[typeof key]) => config[key] = value as never;
-
-  configKeys.forEach(key =>
-    window.api.getConfig(key).then(val => setReactiveConf(key, val))
-  );
 
   window.api.onConfigChange((_config: IConfig) => {
     configKeys.forEach(key => {
