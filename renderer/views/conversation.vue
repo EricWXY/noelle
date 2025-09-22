@@ -104,8 +104,14 @@ window.onresize = throttle(async () => {
 onMounted(async () => {
   await nextTick();
   listHeight.value = window.innerHeight * listScale.value;
-  messagesStore.initialize();
 });
+
+onBeforeRouteUpdate(async (to, from, next) => {
+  if (to.params.id === from.params.id) return next();
+  
+  await messagesStore.initialize(Number(to.params.id));
+  next();
+})
 
 watch(() => defaultModel.value, (val) => {
   if (val && !provider.value) provider.value = val
@@ -114,6 +120,7 @@ watch(() => defaultModel.value, (val) => {
 watch(() => listHeight.value, () => {
   listScale.value = listHeight.value / window.innerHeight;
 });
+
 watch([() => conversationId.value, () => msgInputRef.value], async ([id, msgInput]) => {
   if (!msgInput || !id) {
     provider.value = defaultModel.value;

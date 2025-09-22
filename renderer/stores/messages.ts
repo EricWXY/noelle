@@ -40,17 +40,18 @@ export const useMessagesStore = defineStore('messages', () => {
   // Actions
   /**
    * 初始化 messages 数据
-   * @param conversationId 可选，指定要加载的对话 ID
+   * @param conversationId 指定要加载的对话 ID
    */
-  async function initialize(conversationId?: number) {
-    if (conversationId) {
-      // 只加载特定对话的消息
-      messages.value = await dataBase.messages
-        .where({ conversationId }).toArray()
-    } else {
-      // 加载所有消息
-      messages.value = await dataBase.messages.toArray();
-    }
+  async function initialize(conversationId: number) {
+    if (!conversationId) return
+    const isConversationLoaded = messages.value.some(message => message.conversationId === conversationId);
+
+    if (isConversationLoaded) return;
+
+    // 只加载特定对话的消息
+    const saved = await dataBase.messages
+      .where({ conversationId }).toArray();
+    messages.value = [...messages.value, ...saved];
   };
 
   /**
@@ -87,11 +88,11 @@ export const useMessagesStore = defineStore('messages', () => {
     const conversation = conversationsStore.getConversationById(message.conversationId)
     if (!conversation) return loadingMsgId;
 
-    const provider = providersStore.allProviders.find(p => p.id === conversation.providerId)
+    const provider = providersStore.allProviders.find(p => p.id === conversation.providerId);
 
     if (!provider) return loadingMsgId;
 
-    msgContentMap.set(loadingMsgId, '')
+    msgContentMap.set(loadingMsgId, '');
     let streamCallback: ((stream: DialogueBackStream) => Promise<void>) | void = async (stream) => {
 
       const { messageId, data } = stream;
@@ -118,14 +119,14 @@ export const useMessagesStore = defineStore('messages', () => {
     const messages = messagesByConversationId.value(message.conversationId).filter(item => item.status !== 'loading').map(item => ({
       role: item.type === 'question' ? 'user' : 'assistant' as DialogueMessageRole,
       content: item.content,
-    }))
+    }));
     await window.api.startADialogue({
       messageId: loadingMsgId,
       providerName: provider.name,
       selectedModel: conversation.selectedModel,
       conversationId: message.conversationId,
       messages
-    })
+    });
 
     return loadingMsgId;
   }
