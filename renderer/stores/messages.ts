@@ -6,6 +6,7 @@ import { listenDialogueBack } from '../utils/dialogue'
 import { useConversationsStore } from './conversations'
 import { useProvidersStore } from './providers'
 import { cloneDeep } from '@common/utils';
+import i18n from '../i18n';
 
 const msgContentMap = new Map<number, string>();
 export const stopMethods = new Map<number, () => void>();
@@ -113,7 +114,7 @@ export const useMessagesStore = defineStore('messages', () => {
         streamCallback = void 0;
       }
     }
-    stopMethods.set(loadingMsgId, listenDialogueBack(streamCallback));
+    stopMethods.set(loadingMsgId, listenDialogueBack(streamCallback, loadingMsgId));
     const messages = messagesByConversationId.value(message.conversationId).filter(item => item.status !== 'loading').map(item => ({
       role: item.type === 'question' ? 'user' : 'assistant' as DialogueMessageRole,
       content: item.content,
@@ -133,7 +134,11 @@ export const useMessagesStore = defineStore('messages', () => {
     const stop = stopMethods.get(id);
     stop?.();
     if (update) {
-      await updateMessage(id, { status: 'success', updatedAt: Date.now() })
+      const msgContent = messages.value.find(item => item.id === id)?.content;
+      await updateMessage(id, {
+        status: 'success', updatedAt: Date.now(),
+        content: msgContent ? msgContent + i18n.global.t('main.message.stoppedGeneration') : void 0,
+      });
     }
     stopMethods.delete(id);
   }

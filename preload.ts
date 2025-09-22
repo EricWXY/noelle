@@ -48,12 +48,12 @@ const api: WindowApi = {
   contextMenuItemClick: (menuId: string, cb: (id: string) => void) => ipcRenderer.once(`${IPC_EVENTS.SHOW_CONTEXT_MENU}:${menuId}`, (_event, id) => cb(id)),
 
   startADialogue: (params: CreateDialogueProps) => ipcRenderer.send(IPC_EVENTS.START_A_DIALOGUE, params),
-  onDialogueBack: (cb: (data: DialogueBackStream) => void) => {
+  onDialogueBack: (cb: (data: DialogueBackStream) => void, messageId: number) => {
     const callback = (_event: Electron.IpcRendererEvent, data: DialogueBackStream) => cb(data);
-    ipcRenderer.on(IPC_EVENTS.DIALOGUE_BACK, callback);
-    return () => ipcRenderer.removeListener(IPC_EVENTS.DIALOGUE_BACK, callback);
-  },
-  removeDialogueBackListener: () => ipcRenderer.removeAllListeners(IPC_EVENTS.DIALOGUE_BACK),
+    // const msgId = (data)
+    ipcRenderer.on(IPC_EVENTS.DIALOGUE_BACK + messageId, callback);
+    return () => ipcRenderer.removeListener(IPC_EVENTS.DIALOGUE_BACK + messageId, callback);
+  }
 }
 
 contextBridge.exposeInMainWorld('api', api);

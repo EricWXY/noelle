@@ -41,7 +41,8 @@
       "batchActions": {
         "deleteSelected": "Delete Selected"
       },
-      "rendering": "Thinking..."
+      "rendering": "Thinking...",
+      "stoppedGeneration": "(Stopped generating)"
     }
   },
   "dialog": {

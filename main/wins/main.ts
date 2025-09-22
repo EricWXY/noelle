@@ -116,7 +116,7 @@ export async function setupMainWindow() {
         throw new Error('stream not found');
       };
       for await (const data of chunks) {
-        mainWindow.webContents.send(IPC_EVENTS.DIALOGUE_BACK, {
+        mainWindow.webContents.send(IPC_EVENTS.DIALOGUE_BACK + messageId, {
           messageId,
           data
         })
@@ -130,7 +130,7 @@ export async function setupMainWindow() {
           result: err instanceof Error ? err.message : String(err),
         }
       }
-      mainWindow.webContents.send(IPC_EVENTS.DIALOGUE_BACK, errorContent);
+      mainWindow.webContents.send(IPC_EVENTS.DIALOGUE_BACK + messageId, errorContent);
     }
   })
 }

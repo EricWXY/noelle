@@ -41,7 +41,8 @@
       "batchActions": {
         "deleteSelected": "删除选中项"
       },
-      "rendering": "思考中..."
+      "rendering": "思考中...",
+      "stoppedGeneration": "(已停止生成)"
     }
   },
   "dialog": {

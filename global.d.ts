@@ -71,8 +71,7 @@ interface WindowApi {
 
 
   startADialogue: (params: CreateDialogueProps) => void;
-  onDialogueBack: (cb: (data: DialogueBackStream) => void) => () => void;
-  removeDialogueBackListener: () => void;
+  onDialogueBack: (cb: (data: DialogueBackStream) => void, messageId: number) => () => void;
 }
 
 declare interface Window {

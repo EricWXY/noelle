@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { SelectValue } from '@renderer/types';
-import { Icon as IconifyIcon } from '@iconify/vue'
+import { Icon as IconifyIcon } from '@iconify/vue';
 import { NButton, NIcon } from 'naive-ui';
 import ProviderSelect from './ProviderSelect.vue';
 

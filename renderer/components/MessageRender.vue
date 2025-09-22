@@ -37,9 +37,8 @@ const _findLastElement = (target: HTMLElement): Element | void => {
 
 function addCursor(target: HTMLElement) {
   const lastEl = _findLastElement(target);
-  const cursor = `<b class="_cursor"></b>`;
   if (!lastEl) return
-  lastEl.insertAdjacentHTML('beforeend', cursor);
+  lastEl?.classList.add('_cursor');
 }
 
 async function handleCursor() {
@@ -55,7 +54,7 @@ function removeCursor() {
   const target = document.getElementById(renderId.value);
   if (!target) return;
   const lastEl = _findLastElement(target);
-  lastEl?.lastElementChild?.remove();
+  lastEl?.classList.remove('_cursor');
 }
 
 watch(() => props.content, () => handleCursor());

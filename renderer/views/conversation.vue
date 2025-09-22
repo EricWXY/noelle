@@ -12,15 +12,17 @@ import MessageList from '@renderer/components/MessageList.vue';
 import MessageInput from '@renderer/components/MessageInput.vue';
 import CreateConversation from '@renderer/components/CreateConversation.vue';
 
-const route = useRoute();
-const router = useRouter();
 const listHeight = ref(0);
 const listScale = ref(0.7);
 const maxListHeight = ref(window.innerHeight * 0.7);
+const isStoping = ref(false);
 const message = ref('');
 const provider = ref<SelectValue>();
 // const defaultModel
 const msgInputRef = useTemplateRef<{ selectedProvider: SelectValue }>('msgInputRef');
+
+const route = useRoute();
+const router = useRouter();
 
 const config = useConfig();
 
@@ -32,6 +34,7 @@ const conversationId = computed(() => Number(route.params.id) as number | undefi
 const defaultModel = computed(() => config.defaultModel || void 0);
 
 const messageInputStatus = computed(() => {
+  if (isStoping.value) return 'loading';
   const messages = messagesStore.messagesByConversationId(conversationId.value ?? -1);
   const lastMessage = messages[messages.length - 1];
   if (lastMessage?.status === 'streaming' && lastMessage?.content?.length === 0) return 'loading';
@@ -65,7 +68,7 @@ function handleProviderSelect() {
 }
 
 
-async function sendMessage() {
+async function handleSendMessage() {
   if (!conversationId.value) return;
   await messagesStore.sendMessage({
     type: 'question',
@@ -75,9 +78,13 @@ async function sendMessage() {
   message.value = '';
 }
 
-function handleStopMessage() {
+async function handleStopMessage() {
+  isStoping.value = true;
   const msgIds = messagesStore.loadingMsgIdsByConversationId(conversationId.value ?? -1);
-  msgIds.forEach(id => messagesStore.stopMessage(id));
+  for (const id of msgIds) {
+    await messagesStore.stopMessage(id);
+  }
+  isStoping.value = false;
 }
 
 window.onresize = throttle(async () => {
@@ -142,7 +149,7 @@ watch([() => conversationId.value, () => msgInputRef.value], async ([id, msgInpu
     <div class="input-container bg-bubble-others flex-auto w-[calc(100% + 10px)] ml-[-5px] ">
       <resize-divider direction="horizontal" v-model:size="listHeight" :max-size="maxListHeight" :min-size="100" />
       <message-input class="p-2 pt-0" ref="msgInputRef" v-model:message="message" v-model:provider="provider"
-        :placeholder="t('main.conversation.placeholder')" :status="messageInputStatus" @send="sendMessage"
+        :placeholder="t('main.conversation.placeholder')" :status="messageInputStatus" @send="handleSendMessage"
         @stop="handleStopMessage" @select="handleProviderSelect" />
     </div>
   </div>
