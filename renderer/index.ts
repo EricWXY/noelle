@@ -6,18 +6,14 @@ import { type Plugin } from 'vue';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import { createPinia } from 'pinia';
 import { preloadIcons } from './utils/icons';
+import errorHandler from './utils/vueErrorHandler';
 import i18n from './i18n';
 import TitleBar from './components/TitleBar.vue';
 import DragRegion from './components/DragRegion.vue';
 import directives from './directives';
 import App from './App.vue';
 
-
-const components = [] as Plugin[];
-const installComponents: Plugin = function (app) {
-  components.forEach(component =>
-    app.use(component)
-  );
+const components: Plugin = function (app) {
   app.component('TitleBar', TitleBar)
   app.component('DragRegion', DragRegion)
 }
@@ -47,9 +43,10 @@ preloadIcons().finally(() =>
   createApp(App)
     .use(createPinia())
     .use(directives)
-    .use(installComponents)
+    .use(components)
     .use(router)
     .use(i18n)
+    .use(errorHandler)
     .mount('#app')
 )
 

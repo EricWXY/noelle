@@ -2,7 +2,9 @@
 import type { SelectValue } from '@renderer/types';
 import { Icon as IconifyIcon } from '@iconify/vue';
 import { NButton, NIcon } from 'naive-ui';
+import NativeTooltip from './NativeTooltip.vue'
 import ProviderSelect from './ProviderSelect.vue';
+import { useI18n } from 'vue-i18n';
 
 interface Props {
   placeholder?: string;
@@ -25,12 +27,21 @@ const message = defineModel('message', {
 
 const selectedProvider = defineModel<SelectValue>('provider');
 
+// 使用i18n
+const { t } = useI18n();
+
 const isBtnDisabled = computed(() => {
   if (props.status === 'loading') return true;
   if (props.status === 'streaming') return false;
 
   if (!selectedProvider.value) return true;
   return message.value.length === 0;
+});
+
+const btnTipContent = computed(() => {
+  if (props.status === 'loading') return t('main.message.sending');
+  if (props.status === 'streaming') return t('main.message.stopGeneration');
+  return t('main.message.send');
 });
 
 function handleSend() {
@@ -56,15 +67,17 @@ defineExpose({
       <div class="selecter-container w-[200px]">
         <provider-select v-model="selectedProvider" />
       </div>
-      <n-button circle type="primary" :disabled="isBtnDisabled" @click="handleSend">
-        <template #icon>
-          <n-icon>
-            <iconify-icon v-if="status === 'normal'" class="w-4 h-4" icon="material-symbols:arrow-upward" />
-            <iconify-icon v-else-if="status === 'streaming'" class="w-4 h-4" icon="material-symbols:pause" />
-            <iconify-icon v-else class="w-4 h-4 animate-spin" icon="mdi:loading" />
-          </n-icon>
-        </template>
-      </n-button>
+      <native-tooltip :content="btnTipContent">
+        <n-button circle type="primary" :disabled="isBtnDisabled" @click="handleSend">
+          <template #icon>
+            <n-icon>
+              <iconify-icon v-if="status === 'normal'" class="w-4 h-4" icon="material-symbols:arrow-upward" />
+              <iconify-icon v-else-if="status === 'streaming'" class="w-4 h-4" icon="material-symbols:pause" />
+              <iconify-icon v-else class="w-4 h-4 animate-spin" icon="mdi:loading" />
+            </n-icon>
+          </template>
+        </n-button>
+      </native-tooltip>
     </div>
   </div>
 </template>

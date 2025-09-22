@@ -42,7 +42,10 @@
         "deleteSelected": "Delete Selected"
       },
       "rendering": "Thinking...",
-      "stoppedGeneration": "(Stopped generating)"
+      "stoppedGeneration": "(Stopped generating)",
+      "sending": "Sending",
+      "stopGeneration": "Stop generating",
+      "send": "Send"
     }
   },
   "dialog": {

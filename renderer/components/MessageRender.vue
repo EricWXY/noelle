@@ -68,7 +68,7 @@ watch(() => props.isStreaming, async (newVal, oldVal) => {
 </script>
 
 <template>
-  <template v-if="content.trim().length">
+  <template v-if="content?.trim()?.length">
     <VueMarkdown :id="renderId" class="prose dark:prose-invert prose-slate prose-pre:p-0 text-inherit" :source="content"
       :plugins="[markdownItHighlightjs]" />
   </template>

@@ -30,14 +30,25 @@ export const useConversationsStore = defineStore('conversations', () => {
   const sortBy = ref<SortBy>(savedSortBy ?? 'createAt'); // 默认按更新时间排序
   const sortOrder = ref<SortOrder>(savedSortOrder ?? 'desc'); // 默认倒序排序
 
+  const messagesInputValue = ref(new Map())
+
   // Getters
   // 按置顶状态和更新时间排序，置顶的对话排在前面，相同置顶状态的按更新时间倒序排列
   const allConversations = computed(() => conversations.value);
+
+  const messageInputValueById = computed(() => (conversationId: number) => messagesInputValue.value.get(conversationId) ?? '')
 
   const sortMode = computed(() => ({
     sortBy: sortBy.value,
     sortOrder: sortOrder.value,
   }))
+
+  function setMessageInputValue(
+    conversationId: number,
+    value: string
+  ) {
+    messagesInputValue.value.set(conversationId, value);
+  }
 
   function setSortMode(_sortBy: SortBy, _sortOrder: SortOrder) {
     if (sortBy.value !== _sortBy)
@@ -127,9 +138,11 @@ export const useConversationsStore = defineStore('conversations', () => {
     sortOrder,
     // 计算属性
     allConversations,
+    messageInputValueById,
     sortMode,
     // 方法
     initialize,
+    setMessageInputValue,
     getConversationById,
     addConversation,
     delConversation,
