@@ -5,7 +5,7 @@ import { throttle } from '@common/utils';
 import { useMessagesStore } from '@renderer/stores/messages';
 import { useConversationsStore } from '@renderer/stores/conversations';
 import { useConfig } from '@renderer/hooks/useConfig';
-import { logoData } from '@renderer/logoBase64'
+import { logoData } from '@renderer/logoBase64';
 
 import ResizeDivider from '@renderer/components/ResizeDivider.vue';
 import MessageList from '@renderer/components/MessageList.vue';
@@ -18,7 +18,6 @@ const maxListHeight = ref(window.innerHeight * 0.7);
 const isStoping = ref(false);
 const message = ref('');
 const provider = ref<SelectValue>();
-// const defaultModel
 const msgInputRef = useTemplateRef<{ selectedProvider: SelectValue }>('msgInputRef');
 
 const route = useRoute();
@@ -95,21 +94,21 @@ window.onresize = throttle(async () => {
   if (listHeight.value > maxListHeight.value) {
     listHeight.value = maxListHeight.value;
   }
-}, 10)
+}, 10);
 
 onMounted(async () => {
   await nextTick();
   listHeight.value = window.innerHeight * listScale.value;
   messagesStore.initialize();
-})
+});
 
 watch(() => defaultModel.value, (val) => {
-  if (val) provider.value = val
-}, { once: true })
+  if (val && !provider.value) provider.value = val
+}, { immediate: true, once: true });
 
 watch(() => listHeight.value, () => {
   listScale.value = listHeight.value / window.innerHeight;
-})
+});
 watch([() => conversationId.value, () => msgInputRef.value], async ([id, msgInput]) => {
   if (!msgInput || !id) {
     provider.value = defaultModel.value;
@@ -120,9 +119,9 @@ watch([() => conversationId.value, () => msgInputRef.value], async ([id, msgInpu
   canUpdateConversationTime.value = false;
 
   msgInput.selectedProvider = `${current.providerId}:${current.selectedModel}`;
-  await nextTick()
+  await nextTick();
   canUpdateConversationTime.value = true;
-})
+});
 
 </script>
 <template>

@@ -1,10 +1,10 @@
 
 export function listenDialogueBack(cb: (data: DialogueBackStream) => void, messageId: number) {
-  const stop = window.api.onDialogueBack((stream: DialogueBackStream) => {
+  let stop: (() => void) | void = window.api.onDialogueBack((stream: DialogueBackStream) => {
     cb(stream);
-    if (stream.data.isEnd) {
-    }
-    stream.data.isEnd && stop()
-  }, messageId)
+    if (!stream.data.isEnd) return;
+    stop?.();
+    stop = void 0;
+  }, messageId);
   return stop;
 }
