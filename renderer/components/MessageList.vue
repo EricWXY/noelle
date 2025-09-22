@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Message } from '@renderer/types'
 import { MESSAGE_ITEM_MENU_IDS, MENU_IDS } from '@common/constants';
+import { useMessage } from 'naive-ui';
 import { createContextMenu } from '@renderer/utils/contextMenu';
 import { useDialog } from '@renderer/hooks/useDialog'
 import { useMessagesStore } from '@renderer/stores/messages'
@@ -25,8 +26,7 @@ const checkedIds = ref<number[]>([]);
 const itemChecked = computed(() => (id: number) => checkedIds.value.includes(id));
 
 const route = useRoute();
-
-const { copy } = useClipboard();
+const message = useMessage();
 const { createDialog } = useDialog();
 const { deleteMessage } = useMessagesStore();
 const { t } = useI18n();
@@ -35,7 +35,9 @@ const messageActionPolicy = new Map<MESSAGE_ITEM_MENU_IDS, (msgId: number) => Pr
   [MESSAGE_ITEM_MENU_IDS.COPY, async (msgId: number) => {
     const msg = props.messages.find((msg) => msg.id === msgId);
     if (!msg) return;
-    copy(msg.content);
+    navigator.clipboard.writeText(msg.content).then(()=>{
+      message.success(t('main.message.dialog.copySuccess'));
+    });
   }],
   [MESSAGE_ITEM_MENU_IDS.DELETE, async (msgId: number) => {
     const res = await createDialog({

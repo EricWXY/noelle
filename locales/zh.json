@@ -36,7 +36,8 @@
       "dialog": {
         "title": "确认删除",
         "messageDelete": "确认删除该条消息？",
-        "batchDelete": "确认删除选中的消息？"
+        "batchDelete": "确认删除选中的消息？",
+        "copySuccess": "复制成功"
       },
       "batchActions": {
         "deleteSelected": "删除选中项"

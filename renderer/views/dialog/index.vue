@@ -2,11 +2,9 @@
 import { NConfigProvider } from 'naive-ui';
 import { useNaiveTheme } from '@renderer/hooks/useNaiveTheme';
 import { useNaiveLocale } from '@renderer/hooks/useNaiveLocale';
-// import { usePrimaryColor } from '@renderer/hooks/usePrimaryColor';
 import { useFontSize } from '@renderer/hooks/useFontSize';
 
 
-// usePrimaryColor();
 useFontSize();
 const { theme, themeOverrides } = useNaiveTheme();
 const { locale, dateLocale } = useNaiveLocale();

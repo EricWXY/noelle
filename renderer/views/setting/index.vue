@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NConfigProvider, NScrollbar, NForm, NFormItem, NSelect, NColorPicker, NSwitch, NTabs, NTabPane, type FormInst } from 'naive-ui';
+import { NConfigProvider, NMessageProvider, NScrollbar, NForm, NFormItem, NSelect, NColorPicker, NSwitch, NTabs, NTabPane, type FormInst } from 'naive-ui';
 import { useNaiveTheme } from '@renderer/hooks/useNaiveTheme';
 import { useNaiveLocale } from '@renderer/hooks/useNaiveLocale';
 import { useFontSize } from '@renderer/hooks/useFontSize';
@@ -44,40 +44,41 @@ function onWindowClose() {
 <template>
   <n-config-provider class="bg-main text-tx-primary h-screen flex flex-col" :locale="locale" :date-locale="dateLocale"
     :theme="theme" :theme-overrides="themeOverrides">
-    <title-bar :is-maximizable="false" @close="onWindowClose">
-      <drag-region class="p-2 text-[16px]">{{ t('settings.title') }}</drag-region>
-    </title-bar>
-    <n-scrollbar class="p-4 h-full">
-      <n-tabs class="h-full" size="large" animated default-value="basic" v-model:value="activeTab">
-        <n-tab-pane name="basic" :tab="t('settings.base')">
-          <n-form ref="formRef" :model="formModel">
-            <n-form-item :label="t('settings.theme.label')" path="themeMode">
-              <n-select v-model:value="formModel.themeMode" :options="themeModeOptions" />
-            </n-form-item>
-            <n-form-item :label="`${t('settings.theme.primaryColor')}-${formModel.primaryColor}`">
-              <n-color-picker v-model:value="formModel.primaryColor" :show-alpha="false" />
-            </n-form-item>
-            <n-form-item :label="t('settings.language.label')" path="language">
-              <n-select v-model:value="formModel.language" :options="languageOptions" />
-            </n-form-item>
-            <n-form-item :label="t('settings.appearance.fontSize')">
-              <n-select v-model:value="formModel.fontSize" :options="fontSizeOptions" />
-            </n-form-item>
-            <n-form-item :label="t('settings.behavior.minimizeToTray')" path="minimizeToTray">
-              <n-switch v-model:value="formModel.minimizeToTray" :rail-style="(params) => {
-                return {
-                  background: params.checked ? formModel.primaryColor : 'rgba(0, 0, 0, 0.3)'
-                }
-              }" />
-            </n-form-item>
-          </n-form>
-        </n-tab-pane>
-        <n-tab-pane name="provider" :tab="t('settings.provider.modelConfig')">
-          <providers-config />
-        </n-tab-pane>
-      </n-tabs>
-    </n-scrollbar>
-    <!-- </main> -->
+    <n-message-provider>
+      <title-bar :is-maximizable="false" @close="onWindowClose">
+        <drag-region class="p-2 text-[16px]">{{ t('settings.title') }}</drag-region>
+      </title-bar>
+      <n-scrollbar class="p-4 h-full">
+        <n-tabs class="h-full" size="large" animated default-value="basic" v-model:value="activeTab">
+          <n-tab-pane name="basic" :tab="t('settings.base')">
+            <n-form ref="formRef" :model="formModel">
+              <n-form-item :label="t('settings.theme.label')" path="themeMode">
+                <n-select v-model:value="formModel.themeMode" :options="themeModeOptions" />
+              </n-form-item>
+              <n-form-item :label="`${t('settings.theme.primaryColor')}-${formModel.primaryColor}`">
+                <n-color-picker v-model:value="formModel.primaryColor" :show-alpha="false" />
+              </n-form-item>
+              <n-form-item :label="t('settings.language.label')" path="language">
+                <n-select v-model:value="formModel.language" :options="languageOptions" />
+              </n-form-item>
+              <n-form-item :label="t('settings.appearance.fontSize')">
+                <n-select v-model:value="formModel.fontSize" :options="fontSizeOptions" />
+              </n-form-item>
+              <n-form-item :label="t('settings.behavior.minimizeToTray')" path="minimizeToTray">
+                <n-switch v-model:value="formModel.minimizeToTray" :rail-style="(params) => {
+                  return {
+                    background: params.checked ? formModel.primaryColor : 'rgba(0, 0, 0, 0.3)'
+                  }
+                }" />
+              </n-form-item>
+            </n-form>
+          </n-tab-pane>
+          <n-tab-pane name="provider" :tab="t('settings.provider.modelConfig')">
+            <providers-config />
+          </n-tab-pane>
+        </n-tabs>
+      </n-scrollbar>
+    </n-message-provider>
   </n-config-provider>
 </template>
 

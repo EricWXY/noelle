@@ -51,6 +51,14 @@ function handleSend() {
   emit('send', message.value);
 }
 
+function handlePasteClipboard(e: MouseEvent) {
+  e.preventDefault();
+  navigator.clipboard.readText().then(res => {
+    if (message.value === res) return;
+    message.value = res;
+  })
+}
+
 watch(() => selectedProvider.value, (newVal) => emit('select', newVal));
 
 defineExpose({
@@ -62,7 +70,8 @@ defineExpose({
   <div class="message-input h-full flex flex-col">
     <!-- <div class="tool-bar h-[40px] "></div> -->
     <textarea class="input-area pt-4 px-2 flex-auto w-full text-tx-primary placeholder:text-tx-secondary"
-      :value="message" :placeholder="placeholder" @input="message = ($event!.target as any).value"></textarea>
+      :value="message" :placeholder="placeholder" @input="message = ($event!.target as any).value"
+      @contextmenu="handlePasteClipboard"></textarea>
     <div class="bottom-bar h-[40px] flex justify-between items-center p-2 mb-2">
       <div class="selecter-container w-[200px]">
         <provider-select v-model="selectedProvider" />

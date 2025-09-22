@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { RouterView } from 'vue-router'
-import { NConfigProvider } from 'naive-ui'
+import { NConfigProvider, NMessageProvider } from 'naive-ui'
 
 import { useNaiveTheme } from '@renderer/hooks/useNaiveTheme';
 import { useNaiveLocale } from '@renderer/hooks/useNaiveLocale';
@@ -35,18 +35,20 @@ onMounted(async () => {
 <template>
   <n-config-provider class="h-full w-[100vw] flex" :theme="theme" :theme-overrides="themeOverrides" :locale="locale"
     :date-locale="dateLocale">
-    <aside class="sidebar h-full flex flex-shrink-0 flex-col" :style="{ width: sidebarWidth + 'px' }" v-ripple>
-      <!-- Mac 红绿灯预留 -->
-      <div v-if="isMac" class="w-full h-[35px]"></div>
-      <div class="flex-auto flex">
-        <nav-bar />
-        <conversation-list class="flex-auto" :width="sidebarWidth" @click.stop @mouseleave.stop />
+    <n-message-provider>
+      <aside class="sidebar h-full flex flex-shrink-0 flex-col" :style="{ width: sidebarWidth + 'px' }" v-ripple>
+        <!-- Mac 红绿灯预留 -->
+        <div v-if="isMac" class="w-full h-[35px]"></div>
+        <div class="flex-auto flex">
+          <nav-bar />
+          <conversation-list class="flex-auto" :width="sidebarWidth" @click.stop @mouseleave.stop />
+        </div>
+      </aside>
+      <resize-divider direction="vertical" v-model:size="sidebarWidth" :max-size="500" :min-size="320" />
+      <div class="flex-auto">
+        <router-view />
       </div>
-    </aside>
-    <resize-divider direction="vertical" v-model:size="sidebarWidth" :max-size="500" :min-size="320" />
-    <div class="flex-auto">
-      <router-view />
-    </div>
+    </n-message-provider>
   </n-config-provider>
 </template>
 

@@ -36,7 +36,8 @@
       "dialog": {
         "title": "Confirm Deletion",
         "messageDelete": "Are you sure you want to delete this message?",
-        "batchDelete": "Are you sure you want to delete the selected messages?"
+        "batchDelete": "Are you sure you want to delete the selected messages?",
+        "copySuccess": "Copied successfully"
       },
       "batchActions": {
         "deleteSelected": "Delete Selected"
