@@ -22,6 +22,11 @@ export enum IPC_EVENTS {
   SYSTEM_THEME_CHANGED = 'system-theme-changed',
   CONFIG_CHANGE = 'config-change',
   DIALOGUE_BACK = 'dialogue-back',
+  SHORTCUT_CALLED = 'shortcut-called',
+}
+
+export enum SHORTCUT_KEYS {
+  SEND_MESSAGE = 'CmdOrCtrl+Enter',
 }
 
 export enum WINDOW_NAMES {

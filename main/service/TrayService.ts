@@ -1,7 +1,7 @@
-import { Tray, Menu, ipcMain, globalShortcut, type BrowserWindow, } from 'electron';
+import { Tray, Menu, ipcMain, type BrowserWindow, } from 'electron';
 import { createTranslator, createLogo } from '../utils';
 import { MAIN_WIN_SIZE, IPC_EVENTS, WINDOW_NAMES, CONFIG_KEYS } from '@common/constants';
-
+import shortcutManager from './ShortcutService';
 import windowManager from './WindowService';
 import configManager from './ConfigService';
 
@@ -54,7 +54,8 @@ export class TrayService {
 
     this._tray.setToolTip(t('tray.tooltip') ?? 'Noelle Application');
 
-    globalShortcut.register('CmdOrCtrl+N', showWindow);
+    shortcutManager.register('CmdOrCtrl+N', 'tray.showWindow', showWindow);
+
     this._tray.setContextMenu(Menu.buildFromTemplate([
       { label: t('tray.showWindow'), accelerator: 'CmdOrCtrl+N', click: showWindow },
       { type: 'separator' },
@@ -92,7 +93,8 @@ export class TrayService {
   public destroy() {
     this._tray?.destroy();
     this._tray = null;
-    globalShortcut.unregister('CmdOrCtrl+N');
+
+    shortcutManager.unregister('tray.showWindow');
 
     // 移除语言变化监听器
     if (this._removeLanguageListener) {

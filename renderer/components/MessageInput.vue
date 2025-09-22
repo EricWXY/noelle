@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { SelectValue } from '@renderer/types';
+import { SHORTCUT_KEYS } from '@common/constants'
 import { Icon as IconifyIcon } from '@iconify/vue';
 import { NButton, NIcon } from 'naive-ui';
 import NativeTooltip from './NativeTooltip.vue'
@@ -20,6 +21,7 @@ defineOptions({ name: 'MessageInput' });
 
 const props = withDefaults(defineProps<Props>(), { placeholder: '', status: 'normal' })
 const emit = defineEmits<Emits>();
+const focused = ref(false);
 const message = defineModel('message', {
   type: String,
   default: ''
@@ -59,7 +61,16 @@ function handlePasteClipboard(e: MouseEvent) {
   })
 }
 
+const removeShortcutListener = window.api.onShortcutCalled(SHORTCUT_KEYS.SEND_MESSAGE, () => {
+  if (props.status === 'streaming') return;
+  if (isBtnDisabled.value) return;
+  if (!focused.value) return;
+  handleSend();
+});
+
 watch(() => selectedProvider.value, (newVal) => emit('select', newVal));
+
+onUnmounted(() => removeShortcutListener());
 
 defineExpose({
   selectedProvider,
@@ -71,7 +82,7 @@ defineExpose({
     <!-- <div class="tool-bar h-[40px] "></div> -->
     <textarea class="input-area pt-4 px-2 flex-auto w-full text-tx-primary placeholder:text-tx-secondary"
       :value="message" :placeholder="placeholder" @input="message = ($event!.target as any).value"
-      @contextmenu="handlePasteClipboard"></textarea>
+      @contextmenu="handlePasteClipboard" @focus="focused = true" @blur="focused = false"></textarea>
     <div class="bottom-bar h-[40px] flex justify-between items-center p-2 mb-2">
       <div class="selecter-container w-[200px]">
         <provider-select v-model="selectedProvider" />

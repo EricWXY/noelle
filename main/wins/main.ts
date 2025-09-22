@@ -1,10 +1,11 @@
 import { ipcMain, type BrowserWindow } from 'electron';
-import { WINDOW_NAMES, MAIN_WIN_SIZE, MENU_IDS, IPC_EVENTS, CONFIG_KEYS, CONVERSATION_ITEM_MENU_IDS, CONVERSATION_LIST_MENU_IDS, MESSAGE_ITEM_MENU_IDS } from '@common/constants';
+import { WINDOW_NAMES, MAIN_WIN_SIZE, MENU_IDS, IPC_EVENTS, CONFIG_KEYS, CONVERSATION_ITEM_MENU_IDS, CONVERSATION_LIST_MENU_IDS, MESSAGE_ITEM_MENU_IDS, SHORTCUT_KEYS } from '@common/constants';
 import { TrayService } from '../service/TrayService';
 import windowManager from '../service/WindowService';
 import configManager from '../service/ConfigService';
 import menuManager from '../service/MenuService';
-import { createProvider } from '@main/providers';
+import shortcutManager from '../service/ShortcutService';
+import { createProvider } from '../providers';
 
 const handleTray = (minimizeToTray: boolean, mainWindow: BrowserWindow) => {
   if (minimizeToTray) {
@@ -91,6 +92,12 @@ const registerMenus = (window: BrowserWindow) => {
   ])
 }
 
+const registerShortcuts = (window: BrowserWindow) => {
+  shortcutManager.registerForWindow(window, SHORTCUT_KEYS.SEND_MESSAGE, 'main.sendMessage', () => {
+    window.webContents.send(IPC_EVENTS.SHORTCUT_CALLED+ SHORTCUT_KEYS.SEND_MESSAGE)
+  })
+}
+
 export async function setupMainWindow() {
   const mainWindow = windowManager.create(WINDOW_NAMES.MAIN, MAIN_WIN_SIZE);
 
@@ -106,6 +113,11 @@ export async function setupMainWindow() {
   handleTray(minimizeToTray, mainWindow);
 
   registerMenus(mainWindow);
+  registerShortcuts(mainWindow);
+
+  // mainWindow.on('closed',()=>{
+  //   shortcutManager.unregisterForWindow(mainWindow);
+  // })
 
   ipcMain.on(IPC_EVENTS.START_A_DIALOGUE, async (_event, _data: CreateDialogueProps) => {
     const { providerName, messages, messageId, selectedModel } = _data

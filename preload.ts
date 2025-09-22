@@ -2,7 +2,7 @@
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 
 import { contextBridge, ipcRenderer } from 'electron';
-import { IPC_EVENTS, WINDOW_NAMES } from '@common/constants'
+import { IPC_EVENTS, WINDOW_NAMES } from '@common/constants';
 
 const api: WindowApi = {
   openWindow: (name: WindowNames) => ipcRenderer.send(`${IPC_EVENTS.OPEN_WINDOW}:${name}`),
@@ -50,9 +50,12 @@ const api: WindowApi = {
   startADialogue: (params: CreateDialogueProps) => ipcRenderer.send(IPC_EVENTS.START_A_DIALOGUE, params),
   onDialogueBack: (cb: (data: DialogueBackStream) => void, messageId: number) => {
     const callback = (_event: Electron.IpcRendererEvent, data: DialogueBackStream) => cb(data);
-    // const msgId = (data)
     ipcRenderer.on(IPC_EVENTS.DIALOGUE_BACK + messageId, callback);
     return () => ipcRenderer.removeListener(IPC_EVENTS.DIALOGUE_BACK + messageId, callback);
+  },
+  onShortcutCalled: (key: string, cb: () => void) => {
+    ipcRenderer.on(IPC_EVENTS.SHORTCUT_CALLED + key, (_event) => cb());
+    return () => ipcRenderer.removeListener(IPC_EVENTS.SHORTCUT_CALLED + key, cb);
   }
 }
 
