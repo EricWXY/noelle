@@ -7,7 +7,7 @@ import { useMessagesStore } from '@renderer/stores/messages'
 import { useI18n } from 'vue-i18n';
 import { useBatchTimeAgo } from '@renderer/hooks/useTimeAgo';
 import { NCheckbox, NButton, NScrollbar } from 'naive-ui';
-import MarkdownRender from '@renderer/components/MarkdownRender.vue';
+import MessageRender from '@renderer/components/MessageRender.vue';
 
 const MESSAGE_LIST_CLASS_NAME = 'message-list' as const;
 const SCROLLBAR_CONTENT_CLASS_NAME = 'n-scrollbar-content' as const;
@@ -143,7 +143,8 @@ onMounted(() => {
             </div>
             <div class="msg-shadow p-2 rounded-md bg-bubble-self text-white" v-if="message.type === 'question'"
               @contextmenu="handleContextMenu(message.id)">
-              <markdown-render :source="message.content" />
+              <message-render :msg-id="message.id" :content="message.content"
+                :is-streaming="message.status === 'streaming'" />
             </div>
             <div v-else class="msg-shadow p-2 px-6 rounded-md bg-bubble-others text-tx-primary"
               @contextmenu="handleContextMenu(message.id)">
@@ -151,7 +152,8 @@ onMounted(() => {
                 ...
               </template>
               <template v-else>
-                <markdown-render :source="message.content" />
+                <message-render :msg-id="message.id" :content="message.content"
+                  :is-streaming="message.status === 'streaming'" is-answer />
               </template>
             </div>
           </span>

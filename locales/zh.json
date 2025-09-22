@@ -40,7 +40,8 @@
       },
       "batchActions": {
         "deleteSelected": "删除选中项"
-      }
+      },
+      "rendering": "思考中..."
     }
   },
   "dialog": {
@@ -52,6 +53,11 @@
     "base": "基础设置",
     "provider": {
       "modelConfig": "模型配置"
+    },
+    "providers": {
+      "defaultModel": "默认模型",
+      "apiKey": "API密钥",
+      "apiUrl": "API地址"
     },
     "theme": {
       "label": "主题设置",

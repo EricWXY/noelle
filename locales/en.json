@@ -40,7 +40,8 @@
       },
       "batchActions": {
         "deleteSelected": "Delete Selected"
-      }
+      },
+      "rendering": "Thinking..."
     }
   },
   "dialog": {
@@ -77,6 +78,11 @@
     },
     "language": {
       "label": "Language"
+    },
+    "providers": {
+      "defaultModel": "Default Model",
+      "apiKey": "API Key",
+      "apiUrl": "API URL"
     }
   },
   "menu": {

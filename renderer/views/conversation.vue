@@ -34,7 +34,8 @@ const defaultModel = computed(() => config.defaultModel || void 0);
 const messageInputStatus = computed(() => {
   const messages = messagesStore.messagesByConversationId(conversationId.value ?? -1);
   const lastMessage = messages[messages.length - 1];
-  if (lastMessage.status === 'loading' || lastMessage.status === 'streaming') return lastMessage.status
+  if (lastMessage?.status === 'streaming' && lastMessage?.content?.length === 0) return 'loading';
+  if (lastMessage?.status === 'loading' || lastMessage?.status === 'streaming') return lastMessage.status
   return 'normal';
 })
 
@@ -135,7 +136,7 @@ watch([() => conversationId.value, () => msgInputRef.value], async ([id, msgInpu
     </div>
   </div>
   <div class="h-full flex flex-col" v-else>
-    <div class="w-full min-h-0 " :style="{ height: listHeight + 'px' }">
+    <div class="w-full min-h-0" :style="{ height: listHeight + 'px' }">
       <message-list :messages="messagesStore.messagesByConversationId(conversationId)" />
     </div>
     <div class="input-container bg-bubble-others flex-auto w-[calc(100% + 10px)] ml-[-5px] ">

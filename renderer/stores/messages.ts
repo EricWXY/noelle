@@ -129,11 +129,12 @@ export const useMessagesStore = defineStore('messages', () => {
     return loadingMsgId;
   }
 
-  function stopMessage(id: number) {
+  async function stopMessage(id: number, update: boolean = true) {
     const stop = stopMethods.get(id);
     stop?.();
-    // messages.value = 
-    updateMessage(id, { status: 'success', updatedAt: Date.now() })
+    if (update) {
+      await updateMessage(id, { status: 'success', updatedAt: Date.now() })
+    }
     stopMethods.delete(id);
   }
 
@@ -148,6 +149,7 @@ export const useMessagesStore = defineStore('messages', () => {
    */
   async function deleteMessage(id: number) {
     let currentMsg = cloneDeep(messages.value.find(item => item.id === id));
+    stopMessage(id, false);
     await dataBase.messages.delete(id);
     currentMsg && _updateConversation(currentMsg.conversationId);
     // 从响应式数组中移除

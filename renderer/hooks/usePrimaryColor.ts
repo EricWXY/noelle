@@ -1,6 +1,5 @@
 import { setPrimaryColor, getPrimaryColor } from '@renderer/utils/theme';
 import { useConfig } from './useConfig';
-import { debounce } from '@common/utils';
 import { CONFIG_KEYS } from '@common/constants';
 
 interface PrimaryColors {
@@ -23,10 +22,9 @@ export function usePrimaryColor() {
     primaryColor.value = savedColor.DEFAULT;
     primaryColors.value = savedColor;
   }
-  const onCange = debounce(() => update(), 300);
 
   watch(() => config[CONFIG_KEYS.PRIMARY_COLOR],
-    (color) => (color !== primaryColor.value) && onCange()
+    (color) => (color !== primaryColor.value) && update()
   );
   update();
 

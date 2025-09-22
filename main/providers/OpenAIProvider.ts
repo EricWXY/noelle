@@ -18,7 +18,7 @@ export class OpenAIProvider extends BaseProvider {
     this.client = new OpenAI({ apiKey, baseURL });
   }
   async chat(messages: DialogueMessageProps[], model: string): Promise<AsyncIterable<UniversalChunk>> {
-    const stream = await this.client.chat.completions.create({
+    const chunks = await this.client.chat.completions.create({
       model,
       messages,
       stream: true
@@ -26,7 +26,7 @@ export class OpenAIProvider extends BaseProvider {
 
     return {
       async *[Symbol.asyncIterator]() {
-        for await (const chunk of stream) {
+        for await (const chunk of chunks) {
           yield _transformChunk(chunk);
         }
       }
