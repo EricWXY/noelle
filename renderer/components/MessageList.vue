@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Message } from '@renderer/types'
+import type { Message } from '@common/types';
 import { MESSAGE_ITEM_MENU_IDS, MENU_IDS } from '@common/constants';
 import { useMessage } from 'naive-ui';
 import { createContextMenu } from '@renderer/utils/contextMenu';

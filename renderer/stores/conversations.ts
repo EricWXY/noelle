@@ -1,7 +1,6 @@
-import { ref, computed } from 'vue';
+import type { Conversation } from '@common/types';
 import { defineStore } from 'pinia';
 import { debounce } from '@common/utils'
-import type { Conversation } from '../types';
 import { dataBase } from '../dataBase';
 
 type SortBy = 'updatedAt' | 'createAt' | 'name' | 'model'; // 排序字段类型

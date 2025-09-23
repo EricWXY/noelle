@@ -1,4 +1,4 @@
-import type { Provider } from '../types';
+import type { Provider } from '@common/types';
 import { defineStore } from 'pinia';
 import { deepMerge } from '@common/utils';
 import { dataBase } from '../dataBase';

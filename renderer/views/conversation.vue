@@ -44,6 +44,11 @@ const messageInputStatus = computed(() => {
 const messagesStore = useMessagesStore();
 const conversationsStore = useConversationsStore();
 
+async function handleCreateConversation(create: (title: string) => Promise<number | void>, _message: string) {
+  const id = await create(_message);
+  if (!id) return;
+  afterCreateConversation(id, _message);
+}
 function afterCreateConversation(id: number | void, firstMsg: string) {
   if (!id) return;
   router.push(`/conversation/${id}`);
@@ -108,7 +113,6 @@ onMounted(async () => {
 
 onBeforeRouteUpdate(async (to, from, next) => {
   if (to.params.id === from.params.id) return next();
-  
   await messagesStore.initialize(Number(to.params.id));
   next();
 })
@@ -148,8 +152,7 @@ watch([() => conversationId.value, () => msgInputRef.value], async ([id, msgInpu
       <div class="bg-bubble-others mt-6 max-w-[800px] h-[200px] mx-auto rounded-md">
         <create-conversation :providerId="providerId" :selectedModel="selectedModel" v-slot="{ create }">
           <message-input v-model:message="message" v-model:provider="provider"
-            :placeholder="t('main.conversation.placeholder')" @send="(message) => create(message).then(id => afterCreateConversation(id, message)
-            )" />
+            :placeholder="t('main.conversation.placeholder')" @send="handleCreateConversation(create, message)" />
         </create-conversation>
       </div>
     </div>

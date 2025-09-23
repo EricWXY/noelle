@@ -1,4 +1,4 @@
-import { Message, Conversation, Provider } from './types'
+import { Message, Conversation } from '@common/types'
 
 /**
  * 生成随机日期时间戳
@@ -22,13 +22,13 @@ export const messages: Message[] = [
   { id: 4, content: '光合作用分为光反应和暗反应两个阶段。光反应发生在类囊体膜上，通过光解水产生氧气、ATP和NADPH；暗反应（卡尔文循环）发生在叶绿体基质中，利用这些能量将二氧化碳固定成有机物。', createdAt: randomDate(startDate, endDate), updatedAt: randomDate(startDate, endDate), type: 'answer', conversationId: 1 },
   { id: 5, content: '哪些因素会影响光合作用的效率？', createdAt: randomDate(startDate, endDate), type: 'question', updatedAt: randomDate(startDate, endDate), conversationId: 1 },
   { id: 6, content: '', createdAt: randomDate(startDate, endDate), updatedAt: randomDate(startDate, endDate), type: 'answer', status: 'loading', conversationId: 1 },
-  
+
   // 会话2
   { id: 7, content: '人工智能目前的发展趋势是什么？', createdAt: randomDate(startDate, endDate), updatedAt: randomDate(startDate, endDate), type: 'question', conversationId: 2 },
   { id: 8, content: '当前AI发展呈现出大模型、多模态融合、低代码化、专用化等趋势。大语言模型如GPT、Claude等能力持续提升，同时AI在医疗、金融、教育等垂直领域的应用也日益深入。', createdAt: randomDate(startDate, endDate), updatedAt: randomDate(startDate, endDate), type: 'answer', conversationId: 2 },
   { id: 9, content: 'AI技术在医疗领域有哪些具体应用？', createdAt: randomDate(startDate, endDate), updatedAt: randomDate(startDate, endDate), type: 'question', conversationId: 2 },
   { id: 10, content: 'AI在医疗领域的应用非常广泛，包括医学影像诊断、药物研发、智能病历管理、个性化治疗方案制定等。例如，深度学习算法已能在某些癌症筛查中达到甚至超过专业医生的水平。', createdAt: randomDate(startDate, endDate), updatedAt: randomDate(startDate, endDate), type: 'answer', conversationId: 2 },
-  
+
   // 会话3
   { id: 11, content: '量子计算和传统计算有什么本质区别？', createdAt: randomDate(startDate, endDate), type: 'question', updatedAt: randomDate(startDate, endDate), conversationId: 3 },
   { id: 12, content: '', createdAt: randomDate(startDate, endDate), updatedAt: randomDate(startDate, endDate), type: 'answer', status: 'loading', conversationId: 3 },
@@ -38,39 +38,4 @@ export const conversations: Conversation[] = [
   { id: 1, selectedModel: 'ERNIE-4.0-8K', title: '光合作用基本原理详解', createdAt: randomDate(startDate, endDate), updatedAt: randomDate(startDate, endDate), providerId: 1, pinned: true },
   { id: 2, selectedModel: 'qwen-plus', title: '人工智能发展趋势与应用', createdAt: randomDate(startDate, endDate), updatedAt: randomDate(startDate, endDate), providerId: 2, pinned: false },
   { id: 3, selectedModel: 'deepseek-chat', title: '量子计算基础概念解析', createdAt: randomDate(startDate, endDate), updatedAt: randomDate(startDate, endDate), providerId: 3, pinned: false },
-];
-
-export const providers: Provider[] = [
-  {
-    id: 1,
-    name: 'qianfan',
-    title: '百度千帆',
-    description: '百度千帆大模型平台，提供文心一言系列大模型服务，支持多场景智能交互、内容生成与知识问答。',
-    models: ['ERNIE-4.0-8K', 'ERNIE-3.5-8K', 'ERNIE-Speed-128K'],
-    avatar: 'https://aip-static.cdn.bcebos.com/landing/product/ernie-bote321e5.png',
-    createdAt: new Date('2023-03-01').getTime(),
-    updatedAt: new Date('2024-07-15').getTime()
-  },
-  {
-    id: 2,
-    name: 'dashscope',
-    title: '阿里灵积',
-    description: '阿里云灵积平台，提供通义千问系列大模型服务，具备强大的中文理解能力和多模态生成能力。',
-    // https://help.aliyun.com/zh/dashscope/developer-reference/api-details?spm=a2c4g.11186623.0.0.5bf41507xgULX5#b148acc634pfc
-    models: ['qwen-turbo', 'qwen-plus', 'qwen-max', 'qwen-vl-plus'],
-    avatar: 'https://qph.cf2.poecdn.net/main-thumb-pb-4160791-200-qlqunomdvkyitpedtghnhsgjlutapgfl.jpeg',
-    createdAt: new Date('2023-04-15').getTime(),
-    updatedAt: new Date('2024-06-20').getTime()
-  },
-  {
-    id: 3,
-    name: 'deepseek',
-    title: '深度求索 (DeepSeek)',
-    description: '深度求索提供的大模型服务，专注于代码和数学推理，在技术领域有独特优势。',
-    // https://api-docs.deepseek.com/zh-cn/
-    models: ['deepseek-chat'],
-    avatar: 'https://qph.cf2.poecdn.net/main-thumb-pb-4981273-200-phhqenmywlkiybehuaqvsxpfekviajex.jpeg',
-    createdAt: new Date('2023-06-10').getTime(),
-    updatedAt: new Date('2024-12-27').getTime()
-  }
 ];

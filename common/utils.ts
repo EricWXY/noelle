@@ -110,3 +110,30 @@ export function deepMerge<T extends Record<string, any>>(target: T, source: T): 
   // 其他情况（基本类型），直接返回 source
   return source;
 }
+
+
+/**
+ * 数组对象按照特定key去重
+ * @param array 要去重的对象数组
+ * @param key 用于判断重复的属性名
+ * @returns 去重后的新数组
+ */
+export function uniqueByKey<T extends Record<string, any>>(array: T[], key: keyof T): T[] {
+  // 使用Map存储已经出现过的key值，确保去重的效率为O(n)
+  const seen = new Map<any, boolean>();
+  
+  return array.filter(item => {
+    // 获取当前项的key值
+    const itemKey = item[key];
+    
+    // 检查key值是否已经出现过
+    if (seen.has(itemKey)) {
+      // 如果已出现过，则过滤掉该项
+      return false;
+    }
+    
+    // 如果未出现过，则记录该key值并保留该项
+    seen.set(itemKey, true);
+    return true;
+  });
+}

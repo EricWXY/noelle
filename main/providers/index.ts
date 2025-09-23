@@ -1,5 +1,5 @@
-import { Provider } from '@renderer/types'
-import { configManager } from '../service/ConfigService'
+import type { Provider } from '@common/types';
+import { configManager } from '../service/ConfigService';
 import { CONFIG_KEYS } from '@common/constants'
 import { OpenAIProvider } from './OpenAIProvider';
 

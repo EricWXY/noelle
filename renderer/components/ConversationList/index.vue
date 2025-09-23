@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Conversation } from '@renderer/types';
+import type { Conversation } from '@common/types';
 import { MENU_IDS, CONVERSATION_ITEM_MENU_IDS } from '@common/constants';
 import { CTX_KEY } from './constants';
 import { useDialog } from '@renderer/hooks/useDialog';

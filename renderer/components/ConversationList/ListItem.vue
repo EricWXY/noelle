@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import type { Conversation } from '@renderer/types';
+import type { Conversation } from '@common/types';
 import { Icon as IconifyIcon } from '@iconify/vue';
 import { NCheckbox } from 'naive-ui';
 import { CTX_KEY } from './constants';

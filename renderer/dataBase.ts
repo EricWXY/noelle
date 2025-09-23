@@ -1,5 +1,5 @@
+import type { Provider, Conversation, Message } from '@common/types';
 import Dexie, { type EntityTable } from 'dexie';
-import type { Provider, Conversation, Message } from './types';
 
 export const providers: Provider[] = [
   {

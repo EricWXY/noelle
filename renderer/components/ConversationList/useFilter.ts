@@ -1,6 +1,6 @@
+import type { Conversation } from '@common/types';
 import { useConversationsStore } from '@renderer/stores/conversations';
 import { debounce } from '@common/utils';
-import { Conversation } from '@renderer/types';
 
 
 const searchKey = ref('');

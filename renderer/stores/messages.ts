@@ -1,11 +1,11 @@
-import type { Message, MessageStatus } from '../types';
+import type { Message, MessageStatus } from '@common/types';
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 import { dataBase } from '../dataBase';
 import { listenDialogueBack } from '../utils/dialogue'
 import { useConversationsStore } from './conversations'
 import { useProvidersStore } from './providers'
-import { cloneDeep } from '@common/utils';
+import { cloneDeep, uniqueByKey } from '@common/utils';
 import i18n from '../i18n';
 
 const msgContentMap = new Map<number, string>();
@@ -51,7 +51,8 @@ export const useMessagesStore = defineStore('messages', () => {
     // 只加载特定对话的消息
     const saved = await dataBase.messages
       .where({ conversationId }).toArray();
-    messages.value = [...messages.value, ...saved];
+
+    messages.value = uniqueByKey([...messages.value, ...saved], 'id');
   };
 
   /**
