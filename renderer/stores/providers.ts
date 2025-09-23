@@ -1,6 +1,7 @@
 import type { Provider } from '@common/types';
 import { defineStore } from 'pinia';
-import { deepMerge } from '@common/utils';
+import { deepMerge, parseOpenAISetting } from '@common/utils';
+import { encode } from 'js-base64';
 import { dataBase } from '../dataBase';
 import { useConfig } from '@renderer/hooks/useConfig';
 
@@ -12,7 +13,7 @@ export const useProvidersStore = defineStore('providers', () => {
   const providers = ref<Provider[]>([]);
 
   // 计算属性（替代选项式API的getters）
-  const allProviders = computed(() => providers.value);
+  const allProviders = computed(() => providers.value.map(item => ({ ...item, openAISetting: parseOpenAISetting(item.openAISetting ?? '') })));
 
   const config = useConfig();
 
@@ -32,7 +33,7 @@ export const useProvidersStore = defineStore('providers', () => {
     await dataBase.providers.update(id, { ...provider });
     providers.value = providers.value.map(item => item.id === id ? { ...deepMerge(item, provider) as Provider } : item);
     // 刷新 providers 数据
-    config.provider = JSON.stringify(providers.value);
+    config.provider = encode(JSON.stringify(providers.value));
   }
 
   watch(() => config.provider, () => initialize())

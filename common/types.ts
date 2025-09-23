@@ -42,16 +42,18 @@ export interface Message {
   conversationId: number;
 }
 
+export interface OpenAISetting {
+  baseURL?: string;
+  apiKey?: string;
+}
+
 export interface Provider {
   id: number;
   name: string;
   visible?: boolean;
   title?: string;
   type?: 'OpenAI';
-  openAISetting?: {
-    baseURL?: string;
-    apiKey?: string;
-  };
+  openAISetting?:string;
   createdAt: number;
   updatedAt: number;
   models: string[];

@@ -1,3 +1,5 @@
+import type { OpenAISetting } from '@common/types';
+import { encode, decode } from 'js-base64';
 
 /**
  * 防抖函数
@@ -121,19 +123,38 @@ export function deepMerge<T extends Record<string, any>>(target: T, source: T): 
 export function uniqueByKey<T extends Record<string, any>>(array: T[], key: keyof T): T[] {
   // 使用Map存储已经出现过的key值，确保去重的效率为O(n)
   const seen = new Map<any, boolean>();
-  
+
   return array.filter(item => {
     // 获取当前项的key值
     const itemKey = item[key];
-    
+
     // 检查key值是否已经出现过
     if (seen.has(itemKey)) {
       // 如果已出现过，则过滤掉该项
       return false;
     }
-    
+
     // 如果未出现过，则记录该key值并保留该项
     seen.set(itemKey, true);
     return true;
   });
+}
+
+
+export function stringifyOpenAISetting(setting: OpenAISetting): string {
+  try {
+    return encode(JSON.stringify(setting));
+  } catch (error) {
+    console.error('stringifyOpenAISetting failed:', error);
+    return '';
+  }
+}
+
+export function parseOpenAISetting(setting: string): OpenAISetting {
+  try {
+    return JSON.parse(decode(setting));
+  } catch (e) {
+    console.error('parseOpenAISetting failed:', e);
+    return {} as OpenAISetting;
+  }
 }

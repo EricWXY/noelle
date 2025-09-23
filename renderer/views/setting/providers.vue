@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { NCollapse, NCollapseItem, NSwitch, NInput, NInputGroup, NInputGroupLabel, NDynamicTags, NDivider, NSelect } from 'naive-ui';
+import { stringifyOpenAISetting } from '@common/utils';
 import { useProvidersStore } from '@renderer/stores/providers';
 import { useConfig } from '@renderer/hooks/useConfig';
 
@@ -21,12 +22,12 @@ const providerOptions = computed(() => providersStore.allProviders.filter(item =
 
 function handleApiKeyUpdate(id: number, apiKey: string) {
   const baseURL = providersStore.allProviders.find(item => item.id === id)?.openAISetting?.baseURL ?? ''
-  providersStore.updateProvider(id, { openAISetting: { apiKey, baseURL } });
+  providersStore.updateProvider(id, { openAISetting: stringifyOpenAISetting({ apiKey, baseURL }) });
 }
 
 function handleBaseURLUpdate(id: number, baseURL: string) {
   const apiKey = providersStore.allProviders.find(item => item.id === id)?.openAISetting?.apiKey ?? ''
-  providersStore.updateProvider(id, { openAISetting: { apiKey, baseURL } });
+  providersStore.updateProvider(id, { openAISetting: stringifyOpenAISetting({ apiKey, baseURL }) });
 }
 
 onMounted(() => providersStore.initialize());

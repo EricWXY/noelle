@@ -53,12 +53,11 @@ function handleSend() {
   emit('send', message.value);
 }
 
-function handlePasteClipboard(e: MouseEvent) {
+async function handlePasteClipboard(e: MouseEvent) {
   e.preventDefault();
-  navigator.clipboard.readText().then(res => {
-    if (message.value === res) return;
-    message.value = res;
-  })
+  const content = await navigator.clipboard.readText();
+  if (message.value === content) return;
+  message.value = content;
 }
 
 const removeShortcutListener = listenShortcut(SHORTCUT_KEYS.SEND_MESSAGE, () => {
@@ -74,7 +73,7 @@ onUnmounted(() => removeShortcutListener());
 
 defineExpose({
   selectedProvider,
-})
+});
 </script>
 
 <template>
