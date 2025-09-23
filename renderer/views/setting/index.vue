@@ -4,7 +4,6 @@ import { useNaiveTheme } from '@renderer/hooks/useNaiveTheme';
 import { useNaiveLocale } from '@renderer/hooks/useNaiveLocale';
 import { useFontSize } from '@renderer/hooks/useFontSize';
 import { useConfig } from '@renderer/hooks/useConfig';
-import { useI18n } from 'vue-i18n';
 
 import ProvidersConfig from './providers.vue';
 

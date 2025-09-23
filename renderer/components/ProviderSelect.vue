@@ -2,7 +2,6 @@
 import type { SelectValue } from '@renderer/types';
 import { NSelect } from 'naive-ui';
 import { useProvidersStore } from '@renderer/stores/providers';
-import { useI18n } from 'vue-i18n';
 
 defineOptions({ name: 'ProviderSelect' });
 

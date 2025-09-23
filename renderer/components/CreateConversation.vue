@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useConversationsStore } from '@renderer/stores/conversations';
-import { useI18n } from 'vue-i18n';
 
 defineOptions({ name: 'CreateConversation' });
 const props = defineProps<{

@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { NInput, NInputGroup, NInputGroupLabel, NIcon } from 'naive-ui';
-import { Icon as IconifyIcon } from '@iconify/vue'
+import { Icon as IconifyIcon } from '@iconify/vue';
 import { useFilter } from './useFilter';
 import { useContextMenu } from './useContextMenu';
-import { useI18n } from 'vue-i18n';
 
 
 defineOptions({ name: 'SearchBar' });

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { RouterView } from 'vue-router'
 import { NConfigProvider, NMessageProvider } from 'naive-ui'
 
@@ -9,7 +8,7 @@ import { useFontSize } from '@renderer/hooks/useFontSize';
 
 import { useConversationsStore } from './stores/conversations'
 import { useProvidersStore } from './stores/providers';
-import { initProviders } from './dataBase'
+import { initProviders } from './dataBase';
 import { isMac as isMacOs } from './utils/system';
 
 import ConversationList from '@renderer/components/ConversationList/index.vue';

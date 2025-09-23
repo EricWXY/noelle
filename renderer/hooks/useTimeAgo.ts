@@ -1,5 +1,4 @@
 import { ref, computed, watch, onUnmounted } from 'vue';
-import { useI18n } from 'vue-i18n';
 
 interface TimeAgoOptions {
   /** 间隔更新时间（毫秒），默认60000ms (1分钟) */

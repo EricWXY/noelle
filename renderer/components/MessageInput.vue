@@ -3,9 +3,9 @@ import type { SelectValue } from '@renderer/types';
 import { SHORTCUT_KEYS } from '@common/constants'
 import { Icon as IconifyIcon } from '@iconify/vue';
 import { NButton, NIcon } from 'naive-ui';
+import { listenShortcut } from '../utils/shortcut';
 import NativeTooltip from './NativeTooltip.vue'
 import ProviderSelect from './ProviderSelect.vue';
-import { useI18n } from 'vue-i18n';
 
 interface Props {
   placeholder?: string;
@@ -61,7 +61,7 @@ function handlePasteClipboard(e: MouseEvent) {
   })
 }
 
-const removeShortcutListener = window.api.onShortcutCalled(SHORTCUT_KEYS.SEND_MESSAGE, () => {
+const removeShortcutListener = listenShortcut(SHORTCUT_KEYS.SEND_MESSAGE, () => {
   if (props.status === 'streaming') return;
   if (isBtnDisabled.value) return;
   if (!focused.value) return;

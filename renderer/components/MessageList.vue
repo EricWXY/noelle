@@ -5,7 +5,6 @@ import { useMessage } from 'naive-ui';
 import { createContextMenu } from '@renderer/utils/contextMenu';
 import { useDialog } from '@renderer/hooks/useDialog'
 import { useMessagesStore } from '@renderer/stores/messages'
-import { useI18n } from 'vue-i18n';
 import { useBatchTimeAgo } from '@renderer/hooks/useTimeAgo';
 import { NCheckbox, NButton, NScrollbar } from 'naive-ui';
 import MessageRender from '@renderer/components/MessageRender.vue';

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import VueMarkdown from 'vue-markdown-render';
 import markdownItHighlightjs from 'markdown-it-highlightjs';
-import { useI18n } from 'vue-i18n';
 
 defineOptions({ name: 'MessageRender' })
 const props = defineProps<{
@@ -10,7 +9,6 @@ const props = defineProps<{
   isStreaming: boolean;
 }>()
 
-// 使用i18n
 const { t } = useI18n();
 
 const renderId = computed(() => `msg-render-${props.msgId}`);

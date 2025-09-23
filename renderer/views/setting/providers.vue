@@ -2,13 +2,11 @@
 import { NCollapse, NCollapseItem, NSwitch, NInput, NInputGroup, NInputGroupLabel, NDynamicTags, NDivider, NSelect } from 'naive-ui';
 import { useProvidersStore } from '@renderer/stores/providers';
 import { useConfig } from '@renderer/hooks/useConfig';
-import { useI18n } from 'vue-i18n';
 
 const providersStore = useProvidersStore();
 const config = useConfig();
 const defaultModel = ref(config.defaultModel || void 0);
 
-// 使用i18n
 const { t } = useI18n();
 
 const providerOptions = computed(() => providersStore.allProviders.filter(item => item.visible).map(item => ({
