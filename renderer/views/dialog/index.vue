@@ -49,7 +49,8 @@ function handleConfirm() {
         @click="handleCancel">
         {{ t(params.cancelText || 'dialog.cancel') }}
       </button>
-      <button class="px-4 py-1.5 cursor-pointer rounded-md text-sm text-tx-primary hover:bg-red-200 transition-colors"
+      <button
+        class="px-4 py-1.5 cursor-pointer rounded-md text-sm text-tx-primary hover:bg-red-200 hover:text-red-300   transition-colors"
         @click="handleConfirm">
         {{ t(params.confirmText || 'dialog.confirm') }}
       </button>

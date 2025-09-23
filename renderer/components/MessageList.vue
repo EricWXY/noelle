@@ -34,7 +34,7 @@ const messageActionPolicy = new Map<MESSAGE_ITEM_MENU_IDS, (msgId: number) => Pr
   [MESSAGE_ITEM_MENU_IDS.COPY, async (msgId: number) => {
     const msg = props.messages.find((msg) => msg.id === msgId);
     if (!msg) return;
-    navigator.clipboard.writeText(msg.content).then(()=>{
+    navigator.clipboard.writeText(msg.content).then(() => {
       message.success(t('main.message.dialog.copySuccess'));
     });
   }],
@@ -147,8 +147,12 @@ onMounted(() => {
               <message-render :msg-id="message.id" :content="message.content"
                 :is-streaming="message.status === 'streaming'" />
             </div>
-            <div v-else class="msg-shadow p-2 px-6 rounded-md bg-bubble-others text-tx-primary"
-              @contextmenu="handleContextMenu(message.id)">
+            <div v-else class="msg-shadow p-2 px-6 rounded-md bg-bubble-others" :class="{
+              'bg-bubble-others': message.status !== 'error',
+              'text-tx-primary': message.status !== 'error',
+              'text-red-300': message.status === 'error',
+              'font-bold': message.status === 'error'
+            }" @contextmenu="handleContextMenu(message.id)">
               <template v-if="message.status === 'loading'">
                 ...
               </template>
