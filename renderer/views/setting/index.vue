@@ -64,11 +64,7 @@ function onWindowClose() {
                 <n-select v-model:value="formModel.fontSize" :options="fontSizeOptions" />
               </n-form-item>
               <n-form-item :label="t('settings.behavior.minimizeToTray')" path="minimizeToTray">
-                <n-switch v-model:value="formModel.minimizeToTray" :rail-style="(params) => {
-                  return {
-                    background: params.checked ? formModel.primaryColor : 'rgba(0, 0, 0, 0.3)'
-                  }
-                }" />
+                <n-switch v-model:value="formModel.minimizeToTray" />
               </n-form-item>
             </n-form>
           </n-tab-pane>

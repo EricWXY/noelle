@@ -1,4 +1,4 @@
-import { setPrimaryColor, getPrimaryColor } from '@renderer/utils/theme';
+import { setPrimaryColor } from '@renderer/utils/theme';
 import { useConfig } from './useConfig';
 import { CONFIG_KEYS } from '@common/constants';
 
@@ -16,11 +16,14 @@ export function usePrimaryColor() {
   const config = useConfig();
 
   const update = async () => {
-    const savedColor = await getPrimaryColor();
-    if (!savedColor) return;
-    setPrimaryColor(savedColor.DEFAULT);
-    primaryColor.value = savedColor.DEFAULT;
-    primaryColors.value = savedColor;
+    const stop = window.api.onConfigChange((config) => {
+      if (config[CONFIG_KEYS.PRIMARY_COLOR] !== primaryColor.value) {
+        const colors = setPrimaryColor(config[CONFIG_KEYS.PRIMARY_COLOR]);
+        primaryColor.value = colors.DEFAULT;
+        primaryColors.value = colors;
+        stop?.();
+      }
+    });
   }
 
   watch(() => config[CONFIG_KEYS.PRIMARY_COLOR],

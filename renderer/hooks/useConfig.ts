@@ -33,7 +33,7 @@ configKeys.forEach(key =>
 
 export function useConfig() {
 
-  window.api.onConfigChange((_config: IConfig) => {
+  const removeListener = window.api.onConfigChange((_config: IConfig) => {
     configKeys.forEach(key => {
       if (key === CONFIG_KEYS.LANGUAGE) {
         const lang = getLanguage();
@@ -53,7 +53,7 @@ export function useConfig() {
 
   watch(() => config, () => onReactiveChange(), { deep: true });
 
-  onUnmounted(() => window.api.removeConfigChangeListener(onReactiveChange));
+  onUnmounted(() => removeListener?.());
 
   return config;
 }

@@ -63,7 +63,7 @@ interface WindowApi {
   removeContextMenuListener: (menuId: string) => void;
   contextMenuItemClick: (menuId: string, cb: (id: string) => void) => void;
 
-  onConfigChange: (cb: (config: any) => void) => void
+  onConfigChange: (cb: (config: any) => void) => () => void
   removeConfigChangeListener: (cb: (config: any) => void) => void
 
   _dialogFeedback: (val: 'cancel' | 'confirm', winId: number) => void;

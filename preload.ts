@@ -24,7 +24,11 @@ const api: WindowApi = {
   getConfig: (key: string) => ipcRenderer.invoke(IPC_EVENTS.GET_CONFIG, key),
   setConfig: (key: string, value: any) => ipcRenderer.send(IPC_EVENTS.SET_CONFIG, key, value),
   updateConfig: (value: any) => ipcRenderer.send(IPC_EVENTS.UPDATE_CONFIG, value),
-  onConfigChange: (callback: (config: any) => void) => ipcRenderer.on(IPC_EVENTS.CONFIG_CHANGE, (_, config) => callback(config)),
+  onConfigChange: (callback: (config: any) => void) => {
+    ipcRenderer.on(IPC_EVENTS.CONFIG_CHANGE, (_, config) => callback(config));
+    return () => ipcRenderer.removeListener(IPC_EVENTS.CONFIG_CHANGE, callback);
+  },
+
   removeConfigChangeListener: (callback: (config: any) => void) => ipcRenderer.removeListener(IPC_EVENTS.CONFIG_CHANGE, callback),
 
   _dialogFeedback: (val: 'cancel' | 'confirm', winId: number) => ipcRenderer.send(WINDOW_NAMES.DIALOG + val, winId),

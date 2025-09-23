@@ -1,7 +1,7 @@
 import type { Ref } from 'vue';
 import { darkTheme, lightTheme, type GlobalTheme, type GlobalThemeOverrides } from 'naive-ui';
 import { useThemeMode } from './useThemeMode';
-import { usePrimaryColor  } from './usePrimaryColor';
+import { usePrimaryColor } from './usePrimaryColor';
 import { ref, computed, type ComputedRef } from 'vue';
 
 function _usePrimaryColor() {
@@ -26,19 +26,23 @@ export function useNaiveTheme(): {
   const themeOverrides: ComputedRef<GlobalThemeOverrides> = computed(() => ({
     common: {
       primaryColor: primaryColor.value,
-      primaryColorHover: primaryColorHover.value
+      primaryColorHover: primaryColorHover.value,
+      popoverColor: isDark.value ? '#3A3A3A' : '#FFFFFF'
+    },
+    Switch: {
+      railColorActive: primaryColor.value,
     },
   }))
 
   window.api.isDarkTheme().then(res => {
     theme.value = res ? darkTheme : lightTheme;
   })
-  
+
   onThemeChange(() => theme.value = isDark.value ? darkTheme : lightTheme);
 
   return {
     theme,
-    themeOverrides
+    themeOverrides,
   };
 }
 

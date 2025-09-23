@@ -10,7 +10,7 @@ const config = useConfig();
 const { t } = useI18n();
 
 const defaultModel = computed({
-  get: () => {
+  get() {
     const vals: string[] = [];
     providersStore.allProviders.forEach(provider => {
       if (!provider.visible) return;
@@ -21,8 +21,8 @@ const defaultModel = computed({
     if (!vals.includes(config.defaultModel ?? '')) return null
     return config.defaultModel || null;
   },
-  set: (v) => config.defaultModel = v,
-})
+  set(v) { config.defaultModel = v }
+});
 const providerOptions = computed(() => providersStore.allProviders.map(item => ({
   label: item.title || item.name,
   type: 'group',
@@ -32,7 +32,7 @@ const providerOptions = computed(() => providersStore.allProviders.map(item => (
     value: `${item.id}:${model}`,
     disabled: !item.visible,
   }))
-})))
+})));
 
 function handleApiKeyUpdate(id: number, apiKey: string) {
   const baseURL = providersStore.allProviders.find(item => item.id === id)?.openAISetting?.baseURL ?? '';

@@ -98,6 +98,7 @@ export const setPrimaryColor = (color: string) => {
   });
 
   window.api.setConfig(CONFIG_KEYS.PRIMARY_COLOR, colors.DEFAULT)
+  return colors;
 }
 
 export const getPrimaryColor = async () => {
