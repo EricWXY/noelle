@@ -100,6 +100,16 @@ export const setPrimaryColor = (color: string) => {
   window.api.setConfig(CONFIG_KEYS.PRIMARY_COLOR, colors.DEFAULT)
   return colors;
 }
+export function getCSSVariable(variableName: string): string {
+  // 确保在浏览器环境中运行
+  if (typeof window !== 'undefined') {
+    // 获取根元素的计算样式
+    const rootStyle = window.getComputedStyle(document.documentElement);
+    // 获取CSS变量值并去除可能的空格
+    return rootStyle.getPropertyValue(variableName).trim();
+  }
+  return '';
+}
 
 export const getPrimaryColor = async () => {
   const baseColor = await window.api.getConfig(CONFIG_KEYS.PRIMARY_COLOR);

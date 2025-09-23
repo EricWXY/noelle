@@ -1,5 +1,6 @@
 import type { Ref } from 'vue';
 import { darkTheme, lightTheme, type GlobalTheme, type GlobalThemeOverrides } from 'naive-ui';
+import { getCSSVariable } from '../utils/theme';
 import { useThemeMode } from './useThemeMode';
 import { usePrimaryColor } from './usePrimaryColor';
 import { ref, computed, type ComputedRef } from 'vue';
@@ -23,11 +24,12 @@ export function useNaiveTheme(): {
   const { onThemeChange, isDark } = useThemeMode();
   const { primaryColor, primaryColorHover } = _usePrimaryColor();
 
+  const popoverColor = computed(() => isDark.value ? getCSSVariable('--bubble-others') : getCSSVariable('--bubble-others'));
   const themeOverrides: ComputedRef<GlobalThemeOverrides> = computed(() => ({
     common: {
       primaryColor: primaryColor.value,
       primaryColorHover: primaryColorHover.value,
-      popoverColor: isDark.value ? '#3A3A3A' : '#FFFFFF'
+      popoverColor: popoverColor.value,
     },
     Switch: {
       railColorActive: primaryColor.value,

@@ -67,7 +67,7 @@ watch(() => props.isStreaming, async (newVal, oldVal) => {
 
 <template>
   <template v-if="content?.trim()?.length">
-    <VueMarkdown :id="renderId" class="prose dark:prose-invert prose-slate prose-pre:p-0 text-inherit" :source="content"
+    <VueMarkdown :id="renderId" class="prose dark:prose-invert prose-slate prose-pre:p-0 prose-headings:pt-3 text-inherit" :source="content"
       :plugins="[markdownItHighlightjs]" />
   </template>
   <span class="_cursor" v-else>{{ t('main.message.rendering') }}</span>

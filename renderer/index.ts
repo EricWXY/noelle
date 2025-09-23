@@ -1,6 +1,6 @@
 import './index.css';
 import 'vfonts/Lato.css';
-import 'highlight.js/styles/lioshi.css';
+// import 'highlight.js/styles/lioshi.css';
 
 import { type Plugin } from 'vue';
 import { createRouter, createMemoryHistory } from 'vue-router';
@@ -12,6 +12,11 @@ import TitleBar from './components/TitleBar.vue';
 import DragRegion from './components/DragRegion.vue';
 import directives from './directives';
 import App from './App.vue';
+
+import hljs from 'highlight.js/lib/core';
+import xml from 'highlight.js/lib/languages/xml';
+
+hljs.registerLanguage('vue', xml);
 
 const components: Plugin = function (app) {
   app.component('TitleBar', TitleBar)
