@@ -118,8 +118,8 @@ onBeforeRouteUpdate(async (to, from, next) => {
 })
 
 watch(() => defaultModel.value, (val) => {
-  if (val && !provider.value) provider.value = val
-}, { immediate: true, once: true });
+  if (provider.value !== val && !conversationId.value) provider.value = val
+}, { immediate: true });
 
 watch(() => listHeight.value, () => {
   listScale.value = listHeight.value / window.innerHeight;

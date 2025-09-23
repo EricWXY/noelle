@@ -15,6 +15,9 @@
       "selectModel": "请选择模型",
       "createConversation": "创建对话",
       "searchPlaceholder": "搜索对话...",
+      "goSettings": "快去",
+      "settings": "设置窗口",
+      "addModel": "添加模型",
       "dialog": {
         "title": "确认删除",
         "content": "确定要删除这个对话吗？",

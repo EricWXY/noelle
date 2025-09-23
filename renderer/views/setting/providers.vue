@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Provider } from '@common/types';
 import { NCollapse, NCollapseItem, NSwitch, NInput, NInputGroup, NInputGroupLabel, NDynamicTags, NDivider, NSelect } from 'naive-ui';
 import { stringifyOpenAISetting } from '@common/utils';
 import { useProvidersStore } from '@renderer/stores/providers';
@@ -6,35 +7,35 @@ import { useConfig } from '@renderer/hooks/useConfig';
 
 const providersStore = useProvidersStore();
 const config = useConfig();
-const defaultModel = ref(config.defaultModel || void 0);
 
 const { t } = useI18n();
 
-const providerOptions = computed(() => providersStore.allProviders.filter(item => item.visible).map(item => ({
+const providerOptions = computed(() => providersStore.allProviders.map(item => ({
   label: item.title || item.name,
   type: 'group',
   key: item.id,
   children: item.models.map(model => ({
     label: model,
     value: `${item.id}:${model}`,
+    disabled: !item.visible,
   }))
 })))
 
 function handleApiKeyUpdate(id: number, apiKey: string) {
-  const baseURL = providersStore.allProviders.find(item => item.id === id)?.openAISetting?.baseURL ?? ''
-  providersStore.updateProvider(id, { openAISetting: stringifyOpenAISetting({ apiKey, baseURL }) });
+  const baseURL = providersStore.allProviders.find(item => item.id === id)?.openAISetting?.baseURL ?? '';
+  const update: Partial<Provider> = { openAISetting: stringifyOpenAISetting({ apiKey, baseURL }) };
+  if (!baseURL || !apiKey) update.visible = false;
+  providersStore.updateProvider(id, { ...update });
 }
 
 function handleBaseURLUpdate(id: number, baseURL: string) {
-  const apiKey = providersStore.allProviders.find(item => item.id === id)?.openAISetting?.apiKey ?? ''
-  providersStore.updateProvider(id, { openAISetting: stringifyOpenAISetting({ apiKey, baseURL }) });
+  const apiKey = providersStore.allProviders.find(item => item.id === id)?.openAISetting?.apiKey ?? '';
+  const update: Partial<Provider> = { openAISetting: stringifyOpenAISetting({ apiKey, baseURL }) };
+  if (!baseURL || !apiKey) update.visible = false;
+  providersStore.updateProvider(id, { ...update });
 }
 
 onMounted(() => providersStore.initialize());
-
-watch(() => config.defaultModel, () => defaultModel.value = config.defaultModel, { once: true });
-
-watch(defaultModel, (v) => config.defaultModel = v);
 
 </script>
 
@@ -44,7 +45,7 @@ watch(defaultModel, (v) => config.defaultModel = v);
     <div class="w-[100px]">
       {{ t('settings.providers.defaultModel') }}：
     </div>
-    <n-select v-model:value="defaultModel" :options="providerOptions" />
+    <n-select v-model:value="config.defaultModel" :options="providerOptions" clearable />
   </div>
   <n-divider />
   <n-collapse>
@@ -52,6 +53,7 @@ watch(defaultModel, (v) => config.defaultModel = v);
       :title="provider.title ?? provider.name">
       <template #header-extra>
         <n-switch :value="providersStore.allProviders[index].visible"
+          :disabled="!providersStore.allProviders[index].openAISetting.apiKey || !providersStore.allProviders[index].openAISetting.baseURL"
           @update:value="(v) => providersStore.updateProvider(provider.id, { visible: v })" @click.stop />
       </template>
       <n-input-group class="my-2">

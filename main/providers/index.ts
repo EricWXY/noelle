@@ -60,6 +60,9 @@ export function createProvider(name: string) {
       if (!provider.openAISetting?.apiKey || !provider.openAISetting?.baseURL) {
         throw new Error('apiKey or baseURL not found');
       }
+      if (!provider.visible) {
+        throw new Error(`provider ${provider.name} is disabled`);
+      }
       return new OpenAIProvider(provider.openAISetting.apiKey, provider.openAISetting.baseURL);
     }
   }
