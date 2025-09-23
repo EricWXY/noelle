@@ -7,9 +7,22 @@ import { useConfig } from '@renderer/hooks/useConfig';
 
 const providersStore = useProvidersStore();
 const config = useConfig();
-
 const { t } = useI18n();
 
+const defaultModel = computed({
+  get: () => {
+    const vals: string[] = [];
+    providersStore.allProviders.forEach(provider => {
+      if (!provider.visible) return;
+      provider.models.forEach(model => {
+        vals.push(`${provider.id}:${model}`)
+      })
+    })
+    if (!vals.includes(config.defaultModel ?? '')) return null
+    return config.defaultModel || null;
+  },
+  set: (v) => config.defaultModel = v,
+})
 const providerOptions = computed(() => providersStore.allProviders.map(item => ({
   label: item.title || item.name,
   type: 'group',
@@ -36,7 +49,6 @@ function handleBaseURLUpdate(id: number, baseURL: string) {
 }
 
 onMounted(() => providersStore.initialize());
-
 </script>
 
 <template>
@@ -45,7 +57,7 @@ onMounted(() => providersStore.initialize());
     <div class="w-[100px]">
       {{ t('settings.providers.defaultModel') }}：
     </div>
-    <n-select v-model:value="config.defaultModel" :options="providerOptions" clearable />
+    <n-select v-model:value="defaultModel" :options="providerOptions" clearable />
   </div>
   <n-divider />
   <n-collapse>

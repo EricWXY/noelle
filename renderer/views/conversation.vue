@@ -4,6 +4,7 @@ import { MAIN_WIN_SIZE } from '@common/constants';
 import { throttle } from '@common/utils';
 import { useMessagesStore } from '@renderer/stores/messages';
 import { useConversationsStore } from '@renderer/stores/conversations';
+import { useProvidersStore } from '@renderer/stores/providers';
 import { useConfig } from '@renderer/hooks/useConfig';
 import { logoData } from '@renderer/logoBase64';
 
@@ -27,10 +28,24 @@ const config = useConfig();
 
 const { t } = useI18n();
 
+const messagesStore = useMessagesStore();
+const conversationsStore = useConversationsStore();
+const providersStore = useProvidersStore();
+
 const providerId = computed(() => ((provider.value as string)?.split(':')[0]) ?? '');
 const selectedModel = computed(() => ((provider.value as string)?.split(':')[1]) ?? '');
 const conversationId = computed(() => Number(route.params.id) as number | undefined);
-const defaultModel = computed(() => config.defaultModel || void 0);
+const defaultModel = computed(() => {
+  const vals: string[] = [];
+  providersStore.allProviders.forEach(provider => {
+    if (!provider.visible) return;
+    provider.models.forEach(model => {
+      vals.push(`${provider.id}:${model}`)
+    })
+  })
+  if (!vals.includes(config.defaultModel ?? '')) return null
+  return config.defaultModel || null;
+});
 
 const messageInputStatus = computed(() => {
   if (isStoping.value) return 'loading';
@@ -41,8 +56,6 @@ const messageInputStatus = computed(() => {
   return 'normal';
 })
 
-const messagesStore = useMessagesStore();
-const conversationsStore = useConversationsStore();
 
 async function handleCreateConversation(create: (title: string) => Promise<number | void>, _message: string) {
   const id = await create(_message);
@@ -118,7 +131,7 @@ onBeforeRouteUpdate(async (to, from, next) => {
 })
 
 watch(() => defaultModel.value, (val) => {
-  if (provider.value !== val && !conversationId.value) provider.value = val
+  if (val !== provider.value && !conversationId.value) provider.value = val
 }, { immediate: true });
 
 watch(() => listHeight.value, () => {

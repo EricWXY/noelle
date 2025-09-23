@@ -12,6 +12,7 @@ const config: Reactive<IConfig> = reactive({
   [CONFIG_KEYS.FONT_SIZE]: 14,
   [CONFIG_KEYS.MINIMIZE_TO_TRAY]: false,
   [CONFIG_KEYS.PROVIDER]: '',
+  [CONFIG_KEYS.DEFAULT_MODEL]: null,
 });
 
 const configKeys = [

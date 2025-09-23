@@ -18,7 +18,7 @@ export interface IConfig {
   // provider 配置 JSON
   [CONFIG_KEYS.PROVIDER]?: string;
   // 默认模型
-  [CONFIG_KEYS.DEFAULT_MODEL]?: string;
+  [CONFIG_KEYS.DEFAULT_MODEL]?: string | null;
 }
 export interface Conversation {
   id: number;
@@ -53,7 +53,7 @@ export interface Provider {
   visible?: boolean;
   title?: string;
   type?: 'OpenAI';
-  openAISetting?:string;
+  openAISetting?: string;
   createdAt: number;
   updatedAt: number;
   models: string[];
