@@ -88,5 +88,7 @@ typings/
 # Vite
 .vite/
 
+.ai.doc/
+
 # Electron-Forge
 out/
