@@ -2,7 +2,7 @@
   "name": "noel",
   "productName": "noel",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "Noelle is a cross-platform AI conversation application based on Electron and Vue 3, allowing users to integrate multiple mainstream AI service providers for intelligent conversations, knowledge Q&A, and content generation.",
   "main": ".vite/build/index.js",
   "scripts": {
     "start": "dotenv -e .env electron-forge start",
