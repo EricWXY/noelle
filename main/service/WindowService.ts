@@ -1,8 +1,8 @@
 import { BrowserWindow, screen, type BrowserWindowConstructorOptions, type IpcMainEvent, WebContentsView, ipcMain, BaseWindow, IpcMainInvokeEvent } from 'electron';
-import type { WindowNames } from '@common/types'
+import type { WindowNames } from '@common/types';
 import { WINDOW_NAMES, IPC_EVENTS, CONFIG_KEYS } from '@common/constants';
-import { debounce } from '@common/utils'
-import { createLogo } from '../utils'
+import { debounce } from '@common/utils';
+import { createLogo } from '../utils';
 import { EasingFunctions, createAnimator, AnimtorService } from './AnimtorService';
 import configManager from './ConfigService';
 import themeManager from './ThemeService';
@@ -114,6 +114,7 @@ class WindowService {
     ipcMain.on(IPC_EVENTS.MAXIMIZE_WINDOW, handleMaximizeWindow);
     // 监听获取窗口是否已最大化的 IPC 事件
     ipcMain.handle(IPC_EVENTS.IS_WINDOW_MAXIMIZED, handleIsWindowMaximized);
+
   }
 
   /**
@@ -339,7 +340,7 @@ class WindowService {
   private _setupWinLifecycle(win: BrowserWindow, name: WindowNames) {
     const updateWinStatus = debounce(() => !win?.isDestroyed()
       && win?.webContents?.send(IPC_EVENTS.WINDOW_MAXIMIZED, win?.isMaximized()), 80);
-
+    // win.on('')
     win.once('closed', () => {
       win?.destroy();
       win?.removeAllListeners('resize');

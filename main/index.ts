@@ -1,5 +1,5 @@
 import { app, BrowserWindow } from 'electron';
-import { setupWindows as setupWins } from './wins'
+import { setupWindows as setupWins } from './wins';
 import started from 'electron-squirrel-startup';
 import logManager from './service/LogService';
 
@@ -16,8 +16,8 @@ const setupWindows = () => {
 process.on('uncaughtException', (error) => {
   logManager.error('uncaughtException:', error);
   // 退出应用/重启应用
-  app.relaunch();
-  app.exit(1);
+  // app.relaunch();
+  // app.exit(1);
 });
 
 process.on('unhandledRejection', (reason, promise) =>

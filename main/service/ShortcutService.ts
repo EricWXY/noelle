@@ -1,6 +1,7 @@
 import { app, globalShortcut, type BrowserWindow } from 'electron';
 import logManager from './LogService';
-// import { IPC_EVENTS } from '@common/constants';
+import eventBus from './EventBusService';
+import { SHORTCUT_KEYS } from '@common/constants';
 
 /**
  * 快捷键服务类，用于管理应用的全局快捷键
@@ -57,6 +58,11 @@ export class ShortcutService {
     // this.register('CommandOrControl+N', 'new-window', () => {
     //   // 创建新窗口的逻辑
     // });
+    app.whenReady().then(() => {
+      this.register(SHORTCUT_KEYS.CLOSE_WINDOW, 'close-window', () => {
+        eventBus.emit(SHORTCUT_KEYS.CLOSE_WINDOW);
+      })
+    })
   }
 
   /**
@@ -108,7 +114,7 @@ export class ShortcutService {
 
       return false;
     } catch (error) {
-      logManager.error(`Error unregistering shortcut with id: ${id}`, error); 
+      logManager.error(`Error unregistering shortcut with id: ${id}`, error);
       return false;
     }
   }

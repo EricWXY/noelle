@@ -1,6 +1,7 @@
-import { IPC_EVENTS, WINDOW_NAMES } from '@common/constants';
+import { IPC_EVENTS, WINDOW_NAMES, SHORTCUT_KEYS } from '@common/constants';
 import { BrowserWindow, ipcMain } from 'electron';
 import { windowManager } from '../service/WindowService';
+import eventBus from '../service/EventBusService';
 
 export function setupDialogWindow() {
   let dialogWindow: BrowserWindow | void;
@@ -36,9 +37,15 @@ export function setupDialogWindow() {
         resizable: false,
       }
     );
+    const handleShortcutClose = () => {
+      if (!dialogWindow?.isFocused?.()) return;
+      windowManager.close(dialogWindow, true);
+    }
+    eventBus.on(SHORTCUT_KEYS.CLOSE_WINDOW, handleShortcutClose);
 
     return new Promise<string | void>((resolve) => dialogWindow?.on('closed', () => {
       resolve(feedback);
+      eventBus.off(SHORTCUT_KEYS.CLOSE_WINDOW, handleShortcutClose);
       feedback = void 0;
     }));
   })

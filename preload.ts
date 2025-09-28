@@ -4,6 +4,8 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { IPC_EVENTS, WINDOW_NAMES } from '@common/constants';
 
+let eventId = 0;
+
 const api: WindowApi = {
   openWindow: (name: WindowNames) => ipcRenderer.send(`${IPC_EVENTS.OPEN_WINDOW}:${name}`),
   closeWindow: () => ipcRenderer.send(IPC_EVENTS.CLOSE_WINDOW),
@@ -67,6 +69,31 @@ const api: WindowApi = {
     warn: (message: string, ...meta: any[]) => ipcRenderer.send(IPC_EVENTS.LOG_WARN, message, JSON.stringify(meta)),
     error: (message: string, ...meta: any[]) => ipcRenderer.send(IPC_EVENTS.LOG_ERROR, message, JSON.stringify(meta)),
     fatal: (message: string, ...meta: any[]) => ipcRenderer.send(IPC_EVENTS.LOG_FATAL, message, JSON.stringify(meta)),
+  },
+  events: {
+    on: (eventName: string, cb: (...args: any[]) => void) => {
+      const id = eventId++;
+      ipcRenderer.send(IPC_EVENTS.EVENT_BUS_ON, eventName, id)
+      ipcRenderer.on(IPC_EVENTS.EVENT_BUS_ON + 'back' + id, cb);
+      return () => {
+        ipcRenderer.send(IPC_EVENTS.EVENT_BUS_ON + 'off' + id);
+        ipcRenderer.removeListener(IPC_EVENTS.EVENT_BUS_ON + 'back' + id, cb);
+      }
+    },
+
+    once: (eventName: string, cb: (...args: any[]) => void) => {
+      const id = eventId++;
+      ipcRenderer.send(IPC_EVENTS.EVENT_BUS_ONCE, eventName, id);
+      const callback = (...args: any[]) => {
+        cb(...args);
+        ipcRenderer.removeListener(IPC_EVENTS.EVENT_BUS_ONCE + 'back' + id, callback);
+      }
+      ipcRenderer.on(IPC_EVENTS.EVENT_BUS_ONCE + 'back' + id, callback);
+    },
+
+    emit: (eventName: string, ...args: any[]) => {
+      ipcRenderer.send(IPC_EVENTS.EVENT_BUS_EMIT, eventName, ...args);
+    },
   }
 }
 

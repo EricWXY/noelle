@@ -36,6 +36,7 @@ export class TrayService {
     if (this._tray) return;
 
     this._updateTray();
+    this._window.on('closed', () => this.destroy());
   }
 
   /**

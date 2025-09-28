@@ -5,6 +5,7 @@ import windowManager from '../service/WindowService';
 import configManager from '../service/ConfigService';
 import menuManager from '../service/MenuService';
 import shortcutManager from '../service/ShortcutService';
+import eventBus from '../service/EventBusService';
 import { createProvider } from '../providers';
 
 const handleTray = (minimizeToTray: boolean, mainWindow: BrowserWindow) => {
@@ -94,8 +95,14 @@ const registerMenus = (window: BrowserWindow) => {
 
 const registerShortcuts = (window: BrowserWindow) => {
   shortcutManager.registerForWindow(window, SHORTCUT_KEYS.SEND_MESSAGE, 'main.sendMessage', () => {
-    window.webContents.send(IPC_EVENTS.SHORTCUT_CALLED+ SHORTCUT_KEYS.SEND_MESSAGE)
+    window.webContents.send(IPC_EVENTS.SHORTCUT_CALLED + SHORTCUT_KEYS.SEND_MESSAGE)
   })
+  const onClose = () => {
+    if (!window.isFocused()) return;
+    const isReallyClose = configManager.get(CONFIG_KEYS.MINIMIZE_TO_TRAY) === false;
+    windowManager.close(window, isReallyClose);
+  }
+  eventBus.on(SHORTCUT_KEYS.CLOSE_WINDOW, onClose);
 }
 
 export async function setupMainWindow() {
@@ -115,12 +122,8 @@ export async function setupMainWindow() {
   registerMenus(mainWindow);
   registerShortcuts(mainWindow);
 
-  // mainWindow.on('closed',()=>{
-  //   shortcutManager.unregisterForWindow(mainWindow);
-  // })
-
-  ipcMain.on(IPC_EVENTS.START_A_DIALOGUE, async (_event, _data: CreateDialogueProps) => {
-    const { providerName, messages, messageId, selectedModel } = _data
+  ipcMain.on(IPC_EVENTS.START_A_DIALOGUE, async (_event, props: CreateDialogueProps) => {
+    const { providerName, messages, messageId, selectedModel } = props
     try {
       const provider = createProvider(providerName);
       const chunks = await provider?.chat(messages, selectedModel);

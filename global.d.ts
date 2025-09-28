@@ -81,9 +81,12 @@ interface WindowApi {
     warn: (message: string, ...meta?: any[]) => void;
     error: (message: string, ...meta?: any[]) => void;
     fatal: (message: string, ...meta?: any[]) => void;
-    // warn: (message: string, meta?: any[]) => void;
-    // error: (message: string, meta?: any[]) => void;
-    // fatal: (message: string, meta?: any[]) => void;
+  }
+
+  events: {
+    on: (eventName: string, cb: (...args: any[]) => void) => () => void;
+    once: (eventName: string, cb: (...args: any[]) => void) => void;
+    emit: (eventName: string, ...args: any[]) => void;
   }
 }
 

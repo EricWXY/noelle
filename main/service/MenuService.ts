@@ -1,8 +1,8 @@
 import { Menu, ipcMain, type MenuItemConstructorOptions } from "electron";
-import { IPC_EVENTS, CONFIG_KEYS } from '@common/constants'
-import { createTranslator } from '../utils'
-import { cloneDeep } from '@common/utils'
-import configManager from './ConfigService'
+import { IPC_EVENTS, CONFIG_KEYS } from '@common/constants';
+import { createTranslator } from '../utils';
+import { cloneDeep } from '@common/utils';
+import configManager from './ConfigService';
 import logManager from "./LogService";
 
 let t: ReturnType<typeof createTranslator> = createTranslator();

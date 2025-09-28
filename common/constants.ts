@@ -22,6 +22,9 @@ export enum IPC_EVENTS {
   LOG_ERROR = 'log-error',
   LOG_FATAL = 'log-fatal',
 
+  EVENT_BUS_ON = 'event-bus-on',
+  EVENT_BUS_ONCE = 'event-bus-once',
+  EVENT_BUS_EMIT = 'event-bus-emit',
 
   // main to renderer
   WINDOW_MAXIMIZED = 'window-maximized',
@@ -32,6 +35,7 @@ export enum IPC_EVENTS {
 }
 
 export enum SHORTCUT_KEYS {
+  CLOSE_WINDOW = 'CmdOrCtrl+W',
   SEND_MESSAGE = 'CmdOrCtrl+Enter',
 }
 
