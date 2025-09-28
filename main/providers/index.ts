@@ -4,6 +4,7 @@ import { parseOpenAISetting } from '@common/utils';
 import { decode } from 'js-base64';
 import { configManager } from '../service/ConfigService';
 import { OpenAIProvider } from './OpenAIProvider';
+import { logManager } from '../service/LogService';
 
 interface _Provider extends Omit<Provider, 'openAISetting'> {
   openAISetting?: {
@@ -25,13 +26,13 @@ const _parseProvider = () => {
     result = JSON.parse(decode(providerConfig)) as Provider[];
     isBase64Parsed = true;
   } catch (_e) {
-    console.error('parse base64 provider config failed');
+    logManager.error('parse base64 provider config failed');
   }
 
   if (!isBase64Parsed) try {
     result = JSON.parse(providerConfig) as Provider[];
   } catch (_e) {
-    console.error('parse provider config failed');
+    logManager.error('parse provider config failed');
   }
 
   if (!result.length) return;
@@ -42,7 +43,7 @@ const getProviderConfig = () => {
   try {
     return _parseProvider();
   } catch (e) {
-    console.error('get provider config failed', e);
+    logManager.error('get provider config failed', e);
     return null;
   }
 }

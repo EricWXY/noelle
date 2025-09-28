@@ -4,6 +4,7 @@ import { CONFIG_KEYS, IPC_EVENTS } from '@common/constants';
 import { debounce, simpleCloneDeep } from '@common/utils';
 import * as fs from 'fs';
 import * as path from 'path';
+import logManager from './LogService';
 
 
 const DEFAULT_CONFIG: IConfig = {
@@ -74,10 +75,13 @@ export class ConfigService {
         // 读取配置文件内容
         const configContent = fs.readFileSync(this._configPath, 'utf-8');
         // 解析JSON并合并默认配置
-        return { ...this._defaultConfig, ...JSON.parse(configContent) };
+        const config = { ...this._defaultConfig, ...JSON.parse(configContent) };
+        logManager.info('Configuration loaded successfully from:', this._configPath);
+        return config;
       }
+      logManager.info('Configuration file not found, using default configuration');
     } catch (error) {
-      console.error('Failed to load config:', error);
+      logManager.error('Failed to load config:', error);
     }
     // 返回默认配置
     return { ...this._defaultConfig };
@@ -94,8 +98,9 @@ export class ConfigService {
       fs.writeFileSync(this._configPath, JSON.stringify(this._config, null, 2), 'utf-8');
       // 通知所有监听器配置已更改
       this._notifyListeners();
+      logManager.info('Configuration saved successfully to:', this._configPath);
     } catch (error) {
-      console.error('Failed to save config:', error);
+      logManager.error('Failed to save config:', error);
     }
   }
 
@@ -131,7 +136,11 @@ export class ConfigService {
    * @param autoSave 是否自动保存（默认true）
    */
   public set(key: ConfigKeys, value: unknown, autoSave: boolean = true): void {
-    if (key in this._config) this._config[key] = value as never;
+    if (!(key in this._config)) return;
+    const oldValue = this._config[key];
+    if (oldValue === value) return;
+    this._config[key] = value as never;
+    logManager.debug(`Configuration updated: ${key} from ${JSON.stringify(oldValue)} to ${JSON.stringify(value)}`);
     autoSave && this._saveConfig();
   }
 
@@ -150,6 +159,7 @@ export class ConfigService {
    */
   public resetToDefault(): void {
     this._config = { ...this._defaultConfig };
+    logManager.info('Configuration reset to default values');
     this._saveConfig();
   }
 

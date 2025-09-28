@@ -1,4 +1,4 @@
-import type { BrowserWindow, Rectangle } from 'electron'
+import type { BrowserWindow, Rectangle } from 'electron';
 
 /**
  * 包含各种缓动函数的工具类，用于实现不同的动画缓动效果。

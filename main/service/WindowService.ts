@@ -7,6 +7,7 @@ import { EasingFunctions, createAnimator, AnimtorService } from './AnimtorServic
 import configManager from './ConfigService';
 import themeManager from './ThemeService';
 import path from 'node:path';
+import logManager from './LogService';
 
 /**
  * 定义窗口尺寸配置接口，包含窗口的基本尺寸以及可选的最大、最小尺寸。
@@ -290,8 +291,14 @@ class WindowService {
       size
     });
 
-    if (!isHiddenWin) this._winStates[name].instance = win;
-    if (isHiddenWin) this._winStates[name].isHidden = false;
+    if (!isHiddenWin) {
+      this._winStates[name].instance = win;
+      logManager.info(`Window created: ${name}, size: ${size.width}x${size.height}`);
+    }
+    if (isHiddenWin) {
+      this._winStates[name].isHidden = false;
+      logManager.info(`Hidden window shown: ${name}`);
+    }
 
     return win;
   }
@@ -336,6 +343,7 @@ class WindowService {
       win?.destroy();
       win?.removeAllListeners('resize');
       this._winStates[name].instance = void 0;
+      logManager.info(`Window closed: ${name}`);
     });
     win.on('resize', updateWinStatus)
     this._loadWindowTemplate(win, name);
@@ -390,7 +398,13 @@ class WindowService {
    */
   public focus(target: BrowserWindow | void | null) {
     if (!target) return;
-    if (target?.isMinimized()) target?.restore();
+    const name = this.getName(target);
+    if (target?.isMinimized()) {
+      target?.restore();
+      logManager.debug(`Window restored and focused: ${name}`);
+    } else {
+      logManager.debug(`Window focused: ${name}`);
+    }
 
     target.focus();
   }
@@ -402,6 +416,8 @@ class WindowService {
    */
   public close(target: BrowserWindow | void | null, really: boolean = true) {
     if (!target) return;
+    const name = this.getName(target);
+    logManager.info(`Closing window: ${name}, really: ${really}`);
     this._prepareForCloseAnimation(target);
     this._executeCloseAnimation(target);
     this._handleCloseWindowState(target, really);
@@ -480,11 +496,15 @@ class WindowService {
    * @param target 目标窗口实例
    */
   public toggleMax(target: BrowserWindow | void | null) {
+    if (!target) return;
+    const name = this.getName(target);
     if (target?.isMaximized()) {
       target.restore();
+      logManager.debug(`Window restored: ${name}`);
       return;
     }
     target?.maximize();
+    logManager.debug(`Window maximized: ${name}`);
   }
 
   /**

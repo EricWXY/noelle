@@ -1,6 +1,7 @@
 import { app, BrowserWindow } from 'electron';
 import { setupWindows as setupWins } from './wins'
 import started from 'electron-squirrel-startup';
+import logManager from './service/LogService';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -17,6 +18,7 @@ const setupWindows = () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
+  logManager.info('Application started');
   setupWindows();
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
@@ -32,8 +34,14 @@ app.whenReady().then(() => {
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
+    logManager.info('Application closing due to all windows being closed');
     app.quit();
   };
+});
+
+// Log application exit
+app.on('will-quit', () => {
+  logManager.info('Application is quitting');
 });
 
 // In this file you can include the rest of your app's specific main process

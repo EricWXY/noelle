@@ -1,4 +1,5 @@
 import { app, globalShortcut, type BrowserWindow } from 'electron';
+import logManager from './LogService';
 // import { IPC_EVENTS } from '@common/constants';
 
 /**
@@ -76,14 +77,14 @@ export class ShortcutService {
 
       if (success) {
         this._registeredShortcuts.set(id, accelerator);
-        console.log(`Shortcut registered: ${accelerator} (id: ${id})`);
+        logManager.info(`Shortcut registered: ${accelerator} (id: ${id})`);
       } else {
-        console.error(`Failed to register shortcut: ${accelerator} (id: ${id})`);
+        logManager.error(`Failed to register shortcut: ${accelerator} (id: ${id})`);
       }
 
       return success;
     } catch (error) {
-      console.error(`Error registering shortcut: ${accelerator} (id: ${id})`, error);
+      logManager.error(`Error registering shortcut: ${accelerator} (id: ${id})`, error);
       return false;
     }
   }
@@ -100,13 +101,13 @@ export class ShortcutService {
       if (accelerator) {
         globalShortcut.unregister(accelerator);
         this._registeredShortcuts.delete(id);
-        console.log(`Shortcut unregistered: ${accelerator} (id: ${id})`);
+        logManager.info(`Shortcut unregistered: ${accelerator} (id: ${id})`);
         return true;
       }
 
       return false;
     } catch (error) {
-      console.error(`Error unregistering shortcut with id: ${id}`, error);
+      logManager.error(`Error unregistering shortcut with id: ${id}`, error); 
       return false;
     }
   }
@@ -118,9 +119,9 @@ export class ShortcutService {
     try {
       globalShortcut.unregisterAll();
       this._registeredShortcuts.clear();
-      console.log('All shortcuts unregistered');
+      logManager.info('All shortcuts unregistered');
     } catch (error) {
-      console.error('Error unregistering all shortcuts', error);
+      logManager.error('Error unregistering all shortcuts', error);
     }
   }
 

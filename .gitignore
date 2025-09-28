@@ -89,6 +89,7 @@ typings/
 .vite/
 
 .ai.doc/
+.qwen/
 
 # Electron-Forge
 out/
