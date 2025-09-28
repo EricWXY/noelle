@@ -103,6 +103,12 @@ const registerShortcuts = (window: BrowserWindow) => {
     windowManager.close(window, isReallyClose);
   }
   eventBus.on(SHORTCUT_KEYS.CLOSE_WINDOW, onClose);
+  window.webContents.on('before-input-event', (e, input) => {
+    if (!(input.key === 'F4' && input.alt)) return;
+    if (process.platform === 'darwin') return; // mac 平台 alt+f4 不做处理
+    e.preventDefault();
+    onClose();
+  })
 }
 
 export async function setupMainWindow() {

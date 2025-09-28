@@ -3,9 +3,9 @@ import { setupSettingWindow } from './setting'
 import { setupDialogWindow } from './dialog'
 
 export function setupWindows() {
-  setupMainWindow()
-  setupSettingWindow()
-  setupDialogWindow()
+  setupMainWindow();
+  setupSettingWindow();
+  setupDialogWindow();
 }
 
 export {
