@@ -16,6 +16,12 @@ export enum IPC_EVENTS {
 
   START_A_DIALOGUE = 'start-a-dialogue',
 
+  LOG_DEBUG = 'log-debug',
+  LOG_INFO = 'log-info',
+  LOG_WARN = 'log-warn',
+  LOG_ERROR = 'log-error',
+  LOG_FATAL = 'log-fatal',
+
 
   // main to renderer
   WINDOW_MAXIMIZED = 'window-maximized',

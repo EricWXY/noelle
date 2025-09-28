@@ -17,6 +17,7 @@ export class ShortcutService {
   private constructor() {
     this._registerDefaultShortcuts();
     this._setupAppEvents();
+    logManager.info('Shortcut service initialized');
   }
 
   /**
@@ -134,7 +135,7 @@ export class ShortcutService {
     try {
       return globalShortcut.isRegistered(accelerator);
     } catch (error) {
-      console.error(`Error checking if shortcut is registered: ${accelerator}`, error);
+      logManager.error(`Error checking if shortcut is registered: ${accelerator}`, error);
       return false;
     }
   }
@@ -167,7 +168,7 @@ export class ShortcutService {
       const fullId = `window_${window.id}_${id}`;
       return this.register(accelerator, fullId, callback);
     } catch (error) {
-      console.error(`Error registering shortcut for window: ${accelerator} (id: ${id})`, error);
+      logManager.error(`Error registering shortcut for window: ${accelerator} (id: ${id})`, error);
       return false;
     }
   }

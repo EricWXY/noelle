@@ -1,5 +1,5 @@
 import { createI18n, type I18nOptions, type I18n } from 'vue-i18n';
-
+import { logger } from './utils/logger';
 import { CONFIG_KEYS } from '@common/constants';
 
 const languages = ['zh', 'en'] as const;
@@ -31,7 +31,7 @@ async function handleConfigManager(i18n: I18n) {
     const savedLang: LanguageType = await window.api.getConfig(CONFIG_KEYS.LANGUAGE);
     savedLang && languages.includes(savedLang) && setLanguage(savedLang, i18n);
   } catch (error) {
-    console.warn('Failed to load language config:', error);
+    logger.warn('Failed to load language config:', error);
   }
 }
 

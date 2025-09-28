@@ -1,6 +1,7 @@
 import { nativeImage, type NativeImage } from "electron";
 import { CONFIG_KEYS } from "@common/constants";
 import configManager from "../service/ConfigService";
+import logManager from "../service/LogService";
 import path from "node:path";
 
 import en from '@locales/en.json';
@@ -19,8 +20,8 @@ export function createTranslator() {
         result = result[_key];
       }
       return result as string;
-    } catch (_e) {
-      console.warn('failed to translate key: ', key);
+    } catch (e) {
+      logManager.warn('failed to translate key: ', key, e);
       return key;
     }
   }

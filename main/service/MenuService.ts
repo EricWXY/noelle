@@ -3,6 +3,7 @@ import { IPC_EVENTS, CONFIG_KEYS } from '@common/constants'
 import { createTranslator } from '../utils'
 import { cloneDeep } from '@common/utils'
 import configManager from './ConfigService'
+import logManager from "./LogService";
 
 let t: ReturnType<typeof createTranslator> = createTranslator();
 
@@ -14,6 +15,7 @@ class MenuService {
   private constructor() {
     this._setupIpcListeners();
     this._setupLanguageChangeListener();
+    logManager.info('Menu service initialized');
   }
 
   private _setupIpcListeners() {
@@ -66,7 +68,7 @@ class MenuService {
     // 从模板构建菜单
     const template = cloneDeep(this._menuTemplates.get(menuId));
     if (!template) {
-      console.warn(`Menu template ${menuId} not found`);
+      logManager.warn(`Menu template ${menuId} not found`);
       onClose?.();
       return;
     }
@@ -76,7 +78,7 @@ class MenuService {
     try {
       _dynamicOptions = Array.isArray(dynamicOptions) ? dynamicOptions : JSON.parse(dynamicOptions ?? '[]');
     } catch (error) {
-      console.warn('Failed to parse dynamicOptions:', error);
+      logManager.error('Failed to parse dynamicOptions:', error);
     }
 
     const translationItem = (item: MenuItemConstructorOptions): MenuItemConstructorOptions => {

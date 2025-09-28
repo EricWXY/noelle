@@ -3,7 +3,7 @@ import 'vfonts/Lato.css';
 
 import { createApp } from 'vue';
 import { createPinia } from 'pinia'
-import errorHandler from '@renderer/utils/vueErrorHandler';
+import errorHandler from '@renderer/utils/errorHandler';
 import i18n from '@renderer/i18n'
 import Setting from './index.vue';
 import TitleBar from '@renderer/components/TitleBar.vue';

@@ -1,6 +1,7 @@
 import { Tray, Menu, ipcMain, type BrowserWindow, } from 'electron';
 import { createTranslator, createLogo } from '../utils';
 import { MAIN_WIN_SIZE, IPC_EVENTS, WINDOW_NAMES, CONFIG_KEYS } from '@common/constants';
+import logManager from './LogService';
 import shortcutManager from './ShortcutService';
 import windowManager from './WindowService';
 import configManager from './ConfigService';
@@ -16,6 +17,7 @@ export class TrayService {
   private constructor(window: BrowserWindow) {
     this._window = window;
     this._setupLanguageChangeListener();
+    logManager.info('Tray service initialized');
   }
 
   /**

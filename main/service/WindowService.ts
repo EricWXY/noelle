@@ -73,6 +73,7 @@ class WindowService {
    */
   private constructor() {
     this._setupEvents();
+    logManager.info('Window service initialized');
   }
   /**
    * 判断窗口是否应该被关闭，根据窗口名称和配置进行判断。

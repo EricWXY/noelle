@@ -1,8 +1,9 @@
 import { promisify } from 'util';
-import { app } from 'electron';
+import { app, ipcMain } from 'electron';
 import log from 'electron-log';
 import * as path from 'path';
 import * as fs from 'fs';
+import { IPC_EVENTS } from '@common/constants';
 
 // 转换为Promise形式的fs方法
 const readdirAsync = promisify(fs.readdir);
@@ -37,7 +38,7 @@ export class LogService {
         fs.mkdirSync(logPath, { recursive: true });
       }
     } catch (error) {
-      console.error('Failed to create log directory:', error);
+      this.error('Failed to create log directory:', error);
     }
 
     // 配置electron-log
@@ -60,8 +61,10 @@ export class LogService {
     // 配置文件日志级别
     log.transports.file.level = 'debug';
 
+    this._rewriteConsole();
+    this._setupIpcEvent();
     // 初始化成功日志
-    this.info('LogService initialized successfully');
+    this.info('Log service initialized successfully');
 
     // 立即执行一次日志清理
     this._cleanupOldLogs();
@@ -70,6 +73,31 @@ export class LogService {
     setInterval(() => {
       this._cleanupOldLogs();
     }, this.CLEANUP_INTERVAL_MS);
+  }
+
+  private _rewriteConsole() {
+    console.log = log.info;
+    console.warn = log.warn;
+    console.error = log.error;
+    console.debug = log.debug;
+  }
+
+  private _setupIpcEvent() {
+    const tryToParseMeta = (meta: string) => {
+      try {
+        const result = JSON.parse(meta);
+        if (Array.isArray(result)) return result;
+        return [result];
+      } catch (_e) {
+        return [meta];
+      }
+    };
+
+    ipcMain.on(IPC_EVENTS.LOG_DEBUG, (_, message: string, meta: string) => this.debug(message, ...tryToParseMeta(meta)));
+    ipcMain.on(IPC_EVENTS.LOG_INFO, (_, message: string, meta: string) => this.info(message, ...tryToParseMeta(meta)));
+    ipcMain.on(IPC_EVENTS.LOG_WARN, (_, message: string, meta: string) => this.warn(message, ...tryToParseMeta(meta)));
+    ipcMain.on(IPC_EVENTS.LOG_ERROR, (_, message: string, meta: string) => this.error(message, ...tryToParseMeta(meta)));
+    ipcMain.on(IPC_EVENTS.LOG_FATAL, (_, message: string, meta: string) => this.fatal(message, ...tryToParseMeta(meta)));
   }
 
   /**

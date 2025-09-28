@@ -1,5 +1,6 @@
 import type { Provider, Conversation, Message } from '@common/types';
 import { stringifyOpenAISetting } from '@common/utils';
+import { logger } from './utils/logger';
 import Dexie, { type EntityTable } from 'dexie';
 
 export const providers: Provider[] = [
@@ -78,5 +79,6 @@ export async function initProviders() {
   const count = await dataBase.providers.count();
   if (count === 0) {
     await dataBase.providers.bulkAdd(providers);
+    logger.info('providers data initialized');
   }
 }

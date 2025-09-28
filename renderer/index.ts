@@ -6,7 +6,8 @@ import { type Plugin } from 'vue';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import { createPinia } from 'pinia';
 import { preloadIcons } from './utils/icons';
-import errorHandler from './utils/vueErrorHandler';
+import { logger } from './utils/logger';
+import errorHandler from './utils/errorHandler';
 import i18n from './i18n';
 import TitleBar from './components/TitleBar.vue';
 import DragRegion from './components/DragRegion.vue';
@@ -44,7 +45,8 @@ const router = createRouter({
   ]
 });
 
-preloadIcons().finally(() =>
+preloadIcons().finally(() => {
+  logger.info('icons preloaded');
   createApp(App)
     .use(createPinia())
     .use(directives)
@@ -53,5 +55,5 @@ preloadIcons().finally(() =>
     .use(i18n)
     .use(errorHandler)
     .mount('#app')
-)
+})
 

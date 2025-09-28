@@ -1,6 +1,7 @@
 import { BrowserWindow, ipcMain, nativeTheme } from 'electron';
-import { configManager } from './ConfigService'
-import { IPC_EVENTS, CONFIG_KEYS } from '@common/constants'
+import { configManager } from './ConfigService';
+import { logManager } from './LogService';
+import { IPC_EVENTS, CONFIG_KEYS } from '@common/constants';
 
 class ThemeService {
   private static _instance: ThemeService;
@@ -13,6 +14,7 @@ class ThemeService {
       this._isDark = nativeTheme.shouldUseDarkColors;
     }
     this._setupEvents();
+    logManager.info('Theme service initialized');
   }
   private _setupEvents() {
     ipcMain.handle(IPC_EVENTS.SET_THEME_MODE, (_, mode: ThemeMode) => {

@@ -38,6 +38,7 @@ export class ConfigService {
     // 加载配置
     this._config = this._loadConfig();
     this._setupIpcEvents()
+    logManager.info('Configuration service initialized with config:', this._config);
   }
 
   /**

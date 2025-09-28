@@ -13,6 +13,17 @@ const setupWindows = () => {
   setupWins();
 };
 
+process.on('uncaughtException', (error) => {
+  logManager.error('uncaughtException:', error);
+  // 退出应用/重启应用
+  app.relaunch();
+  app.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) =>
+  logManager.error('unhandledRejection:', reason, promise)
+);
+
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

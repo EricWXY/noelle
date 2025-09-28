@@ -13,20 +13,31 @@ interface PrimaryColors {
 export function usePrimaryColor() {
   const primaryColor = ref<string | void>();
   const primaryColors = ref<PrimaryColors | null>(null);
+  const first = ref(true);
   const config = useConfig();
 
-  const update = async () => {
+  const update = () => {
+    const _setPrimaryColor = (color: string) => {
+      const colors = setPrimaryColor(color);
+      primaryColor.value = colors.DEFAULT;
+      primaryColors.value = colors;
+      return colors;
+    }
+    if (first.value) {
+      first.value = false;
+      _setPrimaryColor(config[CONFIG_KEYS.PRIMARY_COLOR]);
+      return;
+    }
     const stop = window.api.onConfigChange((config) => {
       if (config[CONFIG_KEYS.PRIMARY_COLOR] !== primaryColor.value) {
-        const colors = setPrimaryColor(config[CONFIG_KEYS.PRIMARY_COLOR]);
-        primaryColor.value = colors.DEFAULT;
-        primaryColors.value = colors;
+        _setPrimaryColor(config[CONFIG_KEYS.PRIMARY_COLOR]);
         stop?.();
       }
     });
   }
 
-  watch(() => config[CONFIG_KEYS.PRIMARY_COLOR],
+  watch(
+    () => config[CONFIG_KEYS.PRIMARY_COLOR],
     (color) => (color !== primaryColor.value) && update()
   );
   update();

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { logger } from '../utils/logger';
+
 interface Props {
   content: string;
 }
@@ -9,7 +11,7 @@ const props = defineProps<Props>()
 const slots = defineSlots()
 
 if (slots?.default?.().length > 1) {
-  console.warn('NativeTooltip slot only support one element');
+  logger.warn('NativeTooltip slot only support one element');
 }
 
 function updateTooltipContent(content: string) {
