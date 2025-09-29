@@ -1,4 +1,4 @@
-import { BrowserWindow, screen, type BrowserWindowConstructorOptions, type IpcMainEvent, WebContentsView, ipcMain, BaseWindow, IpcMainInvokeEvent } from 'electron';
+import { BrowserWindow, screen, type BrowserWindowConstructorOptions, type IpcMainEvent, WebContentsView, ipcMain, BaseWindow, IpcMainInvokeEvent, app } from 'electron';
 import type { WindowNames } from '@common/types';
 import { WINDOW_NAMES, IPC_EVENTS, CONFIG_KEYS } from '@common/constants';
 import { debounce } from '@common/utils';
@@ -297,9 +297,23 @@ class WindowService {
       this._winStates[name].instance = win;
       logManager.info(`Window created: ${name}, size: ${size.width}x${size.height}`);
     }
+
     if (isHiddenWin) {
       this._winStates[name].isHidden = false;
       logManager.info(`Hidden window shown: ${name}`);
+    }
+
+    // 禁用打开开发者工具快捷键(ctrl+shift+I)
+    if (app.isPackaged) {
+      win.webContents.on('before-input-event', (e, input) => {
+        if (!win.isFocused()) return;
+        if (
+          input.type === 'keyDown' &&
+          input.code === 'KeyI' &&
+          input.modifiers.includes('control') &&
+          input.modifiers.includes('shift')
+        ) e.preventDefault();
+      })
     }
 
     return win;

@@ -6,6 +6,7 @@ import windowManager from '../service/WindowService';
 import configManager from '../service/ConfigService';
 import menuManager from '../service/MenuService';
 import shortcutManager from '../service/ShortcutService';
+import logManager from '@main/service/LogService';
 
 const handleTray = (minimizeToTray: boolean, mainWindow: BrowserWindow) => {
   if (minimizeToTray) {
@@ -18,6 +19,7 @@ const handleTray = (minimizeToTray: boolean, mainWindow: BrowserWindow) => {
 const registerMenus = (window: BrowserWindow) => {
 
   const conversationItemMenuItemClick = (id: string) => {
+    logManager.logUserOperation(`${IPC_EVENTS.SHOW_CONTEXT_MENU}:${MENU_IDS.CONVERSATION_ITEM}-${id}`)
     window.webContents.send(`${IPC_EVENTS.SHOW_CONTEXT_MENU}:${MENU_IDS.CONVERSATION_ITEM}`, id);
   }
 
@@ -40,6 +42,7 @@ const registerMenus = (window: BrowserWindow) => {
   ])
 
   const conversationListMenuItemClick = (id: string) => {
+    logManager.logUserOperation(`${IPC_EVENTS.SHOW_CONTEXT_MENU}:${MENU_IDS.CONVERSATION_LIST}-${id}`)
     window.webContents.send(`${IPC_EVENTS.SHOW_CONTEXT_MENU}:${MENU_IDS.CONVERSATION_LIST}`, id);
   }
 
@@ -69,6 +72,7 @@ const registerMenus = (window: BrowserWindow) => {
   ])
 
   const messageItemMenuItemClick = (id: string) => {
+    logManager.logUserOperation(`${IPC_EVENTS.SHOW_CONTEXT_MENU}:${MENU_IDS.MSSAGE_ITEM}-${id}`)
     window.webContents.send(`${IPC_EVENTS.SHOW_CONTEXT_MENU}:${MENU_IDS.MSSAGE_ITEM}`, id);
   }
 
@@ -94,24 +98,20 @@ const registerMenus = (window: BrowserWindow) => {
 
 const registerShortcuts = (window: BrowserWindow) => {
   const onClose = () => {
-    if (!window.isFocused()) return;
     const isReallyClose = configManager.get(CONFIG_KEYS.MINIMIZE_TO_TRAY) === false;
     windowManager.close(window, isReallyClose);
+    return true; // e.preventDefault()
   }
   shortcutManager.registerForWindow(window, (input) => {
-    if (input.key === 'F4' && input.alt) {
-      if (process.platform === 'darwin') return; // mac 平台 alt+f4 不做处理
-      onClose();
-      return true; // e.preventDefault()
-    }
-    if (input.code === 'KeyW' && input.modifiers.includes('control')) {
-      onClose();
-      return true; // e.preventDefault();
-    }
-    if (input.code === 'Enter' && input.modifiers.includes('control')) {
+    if ((input.key === 'F4' && input.alt) && (process.platform !== 'darwin'))
+      return onClose();
+
+    if (input.code === 'KeyW' && input.modifiers.includes('control'))
+      return onClose();
+
+    if (input.code === 'Enter' && input.modifiers.includes('control'))
       window.webContents.send(IPC_EVENTS.SHORTCUT_CALLED + SHORTCUT_KEYS.SEND_MESSAGE);
-    }
-  })
+  });
 }
 
 export async function setupMainWindow() {
