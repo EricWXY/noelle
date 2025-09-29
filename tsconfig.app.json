@@ -43,7 +43,6 @@
 	"include": [
 		"renderer/**/*.tsx",
 		"renderer/**/*.vue",
-		"renderer/**/*.d.ts",
 		"**/*.d.ts",
 		"**/*.ts",
 	]

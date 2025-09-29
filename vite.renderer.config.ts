@@ -1,17 +1,17 @@
 import { CSSOptions, defineConfig } from 'vite';
-import AutoImport from 'unplugin-auto-import/vite';
 import { resolve } from 'node:path';
 
 // https://vitejs.dev/config
 export default defineConfig(async () => {
   const vue = (await import('@vitejs/plugin-vue')).default;
   const tailwindcss = (await import('@tailwindcss/vite')).default;
+  const autoImport = (await import('unplugin-auto-import/vite')).default;
 
   return {
     plugins: [
       vue(),
       tailwindcss(),
-      AutoImport({
+      autoImport({
         imports: ['vue', 'vue-router', 'pinia', 'vue-i18n', '@vueuse/core'],
         dts: 'renderer/auto-imports.d.ts'
       })
