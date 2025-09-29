@@ -1,7 +1,5 @@
 import { app, globalShortcut, type BrowserWindow } from 'electron';
 import logManager from './LogService';
-import eventBus from './EventBusService';
-import { SHORTCUT_KEYS } from '@common/constants';
 
 /**
  * 快捷键服务类，用于管理应用的全局快捷键
@@ -54,14 +52,12 @@ export class ShortcutService {
    * 注册默认快捷键
    */
   private _registerDefaultShortcuts() {
-    // 示例：注册一些默认快捷键
-    // this.register('CommandOrControl+N', 'new-window', () => {
-    //   // 创建新窗口的逻辑
-    // });
     app.whenReady().then(() => {
-      this.register(SHORTCUT_KEYS.CLOSE_WINDOW, 'close-window', () => {
-        eventBus.emit(SHORTCUT_KEYS.CLOSE_WINDOW);
-      })
+
+      // 示例：注册一些默认快捷键
+      // this.register('CommandOrControl+N', 'new-window', () => {
+      //   // 创建新窗口的逻辑
+      // });
     })
   }
 
@@ -154,46 +150,21 @@ export class ShortcutService {
     return new Map(this._registeredShortcuts);
   }
 
+
   /**
    * 为特定窗口注册快捷键
    * @param window 目标窗口
-   * @param accelerator 快捷键组合
-   * @param id 快捷键唯一标识
-   * @param callback 快捷键触发时的回调函数
-   * @returns 是否注册成功
+   * @param callback 快捷键触发时的回调函数 
    */
   public registerForWindow(
     window: BrowserWindow,
-    accelerator: Electron.Accelerator,
-    id: string,
-    callback: () => void
-  ): boolean {
-    // 窗口快捷键可以通过webContents.on('before-input-event')实现
-    // 这里只是一个示例实现，实际可能需要更复杂的逻辑
-    try {
-      const fullId = `window_${window.id}_${id}`;
-      return this.register(accelerator, fullId, callback);
-    } catch (error) {
-      logManager.error(`Error registering shortcut for window: ${accelerator} (id: ${id})`, error);
-      return false;
-    }
-  }
-
-  /**
-   * 为特定窗口注销所有快捷键
-   * @param window 目标窗口
-   */
-  public unregisterForWindow(window: BrowserWindow): void {
-    const windowPrefix = `window_${window.id}_`;
-    const idsToRemove: string[] = [];
-
-    this._registeredShortcuts.forEach((_, id) => {
-      if (id.startsWith(windowPrefix)) {
-        idsToRemove.push(id);
+    callback: (input: Electron.Input) => boolean | void
+  ) {
+    window.webContents.on('before-input-event', (e, input) => {
+      if (callback(input) === true) {
+        e.preventDefault();
       }
-    });
-
-    idsToRemove.forEach(id => this.unregister(id));
+    })
   }
 }
 

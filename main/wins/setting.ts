@@ -1,7 +1,7 @@
-import { IPC_EVENTS, WINDOW_NAMES, SHORTCUT_KEYS } from '@common/constants';
+import { IPC_EVENTS, WINDOW_NAMES } from '@common/constants';
 import { ipcMain } from 'electron';
 import { windowManager } from '../service/WindowService';
-import eventBus from '../service/EventBusService';
+import { shortcutManager } from '../service/ShortcutService';
 
 
 export function setupSettingWindow() {
@@ -17,8 +17,12 @@ export function setupSettingWindow() {
       if (!_win?.isFocused?.()) return;
       windowManager.close(_win, false);
     }
-    eventBus.on(SHORTCUT_KEYS.CLOSE_WINDOW, onClose);
-    _win.on('closed', () => eventBus.off(SHORTCUT_KEYS.CLOSE_WINDOW, onClose))
+    shortcutManager.registerForWindow(_win, (input) => {
+      if (input.code === 'KeyW' && input.modifiers.includes('control')) {
+        onClose();
+        return true;
+      }
+    })
   });
 }
 

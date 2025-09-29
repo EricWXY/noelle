@@ -1,12 +1,11 @@
 import { ipcMain, type BrowserWindow } from 'electron';
 import { WINDOW_NAMES, MAIN_WIN_SIZE, MENU_IDS, IPC_EVENTS, CONFIG_KEYS, CONVERSATION_ITEM_MENU_IDS, CONVERSATION_LIST_MENU_IDS, MESSAGE_ITEM_MENU_IDS, SHORTCUT_KEYS } from '@common/constants';
+import { createProvider } from '../providers';
 import { TrayService } from '../service/TrayService';
 import windowManager from '../service/WindowService';
 import configManager from '../service/ConfigService';
 import menuManager from '../service/MenuService';
 import shortcutManager from '../service/ShortcutService';
-import eventBus from '../service/EventBusService';
-import { createProvider } from '../providers';
 
 const handleTray = (minimizeToTray: boolean, mainWindow: BrowserWindow) => {
   if (minimizeToTray) {
@@ -94,20 +93,24 @@ const registerMenus = (window: BrowserWindow) => {
 }
 
 const registerShortcuts = (window: BrowserWindow) => {
-  shortcutManager.registerForWindow(window, SHORTCUT_KEYS.SEND_MESSAGE, 'main.sendMessage', () => {
-    window.webContents.send(IPC_EVENTS.SHORTCUT_CALLED + SHORTCUT_KEYS.SEND_MESSAGE)
-  })
   const onClose = () => {
     if (!window.isFocused()) return;
     const isReallyClose = configManager.get(CONFIG_KEYS.MINIMIZE_TO_TRAY) === false;
     windowManager.close(window, isReallyClose);
   }
-  eventBus.on(SHORTCUT_KEYS.CLOSE_WINDOW, onClose);
-  window.webContents.on('before-input-event', (e, input) => {
-    if (!(input.key === 'F4' && input.alt)) return;
-    if (process.platform === 'darwin') return; // mac 平台 alt+f4 不做处理
-    e.preventDefault();
-    onClose();
+  shortcutManager.registerForWindow(window, (input) => {
+    if (input.key === 'F4' && input.alt) {
+      if (process.platform === 'darwin') return; // mac 平台 alt+f4 不做处理
+      onClose();
+      return true; // e.preventDefault()
+    }
+    if (input.code === 'KeyW' && input.modifiers.includes('control')) {
+      onClose();
+      return true; // e.preventDefault();
+    }
+    if (input.code === 'Enter' && input.modifiers.includes('control')) {
+      window.webContents.send(IPC_EVENTS.SHORTCUT_CALLED + SHORTCUT_KEYS.SEND_MESSAGE);
+    }
   })
 }
 
