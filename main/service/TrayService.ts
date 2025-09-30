@@ -1,4 +1,4 @@
-import { Tray, Menu, ipcMain, app, type BrowserWindow, } from 'electron';
+import { Tray, Menu, ipcMain, app } from 'electron';
 import { createTranslator, createLogo } from '../utils';
 import { MAIN_WIN_SIZE, IPC_EVENTS, WINDOW_NAMES, CONFIG_KEYS } from '@common/constants';
 import logManager from './LogService';
@@ -8,14 +8,12 @@ import configManager from './ConfigService';
 
 let t: ReturnType<typeof createTranslator> = createTranslator();
 
-export class TrayService {
+class TrayService {
   private static _instance: TrayService;
   private _tray: Tray | null = null;
-  private _window: BrowserWindow;
   private _removeLanguageListener?: () => void;
 
-  private constructor(window: BrowserWindow) {
-    this._window = window;
+  private constructor() {
     this._setupLanguageChangeListener();
     logManager.info('Tray service initialized');
   }
@@ -23,9 +21,9 @@ export class TrayService {
   /**
    * 创建或获取TrayService实例
    */
-  public static getInstance(window: BrowserWindow) {
-    if (!this._instance && window)
-      this._instance = new TrayService(window);
+  public static getInstance() {
+    if (!this._instance)
+      this._instance = new TrayService();
     return this._instance;
   }
 
@@ -50,8 +48,12 @@ export class TrayService {
     }
 
     const showWindow = () => {
-      if (!this._window?.isDestroyed() && this._window?.isVisible())
-        return this._window?.focus();
+      const mainWindow = windowManager.get(WINDOW_NAMES.MAIN);
+      if (mainWindow && !mainWindow?.isDestroyed() && mainWindow?.isVisible() && !mainWindow?.isFocused())
+        return mainWindow?.focus();
+      if (mainWindow?.isMinimized())
+        return mainWindow?.restore();
+      if (mainWindow?.isVisible() && mainWindow?.isFocused()) return;
       windowManager.create(WINDOW_NAMES.MAIN, MAIN_WIN_SIZE);
     };
 
@@ -106,3 +108,6 @@ export class TrayService {
     }
   }
 }
+
+export const trayManager = TrayService.getInstance();
+export default trayManager;

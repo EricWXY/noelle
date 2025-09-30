@@ -1,19 +1,19 @@
 import { ipcMain, type BrowserWindow } from 'electron';
 import { WINDOW_NAMES, MAIN_WIN_SIZE, MENU_IDS, IPC_EVENTS, CONFIG_KEYS, CONVERSATION_ITEM_MENU_IDS, CONVERSATION_LIST_MENU_IDS, MESSAGE_ITEM_MENU_IDS, SHORTCUT_KEYS } from '@common/constants';
 import { createProvider } from '../providers';
-import { TrayService } from '../service/TrayService';
+import trayManager from '../service/TrayService';
 import windowManager from '../service/WindowService';
 import configManager from '../service/ConfigService';
 import menuManager from '../service/MenuService';
 import shortcutManager from '../service/ShortcutService';
 import logManager from '@main/service/LogService';
 
-const handleTray = (minimizeToTray: boolean, mainWindow: BrowserWindow) => {
+const handleTray = (minimizeToTray: boolean) => {
   if (minimizeToTray) {
-    TrayService.getInstance(mainWindow)?.create()
+    trayManager.create()
     return
   }
-  TrayService.getInstance(mainWindow)?.destroy()
+  trayManager.destroy()
 }
 
 const registerMenus = (window: BrowserWindow) => {
@@ -115,9 +115,9 @@ export async function setupMainWindow() {
     configManager.onConfigChange((config) => {
       if (minimizeToTray === config[CONFIG_KEYS.MINIMIZE_TO_TRAY]) return;
       minimizeToTray = config[CONFIG_KEYS.MINIMIZE_TO_TRAY];
-      handleTray(minimizeToTray, mainWindow);
+      handleTray(minimizeToTray);
     });
-    handleTray(minimizeToTray, mainWindow);
+    handleTray(minimizeToTray);
     registerMenus(mainWindow);
     registerShortcuts(mainWindow);
   })
