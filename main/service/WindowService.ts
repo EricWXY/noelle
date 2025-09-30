@@ -29,7 +29,6 @@ const SHARE_WINDOW_OPTS = {
   titleBarStyle: 'hidden', // 隐藏窗口标题栏
   opacity: 0, // 窗口初始透明度为 0
   show: false,
-  icon: createLogo(), // 设置窗口图标
   title: 'Noelle',
   darkTheme: themeManager.isDark,
   backgroundColor: themeManager.isDark ? '#2C2C2C' : '#FFFFFF',
@@ -58,6 +57,7 @@ class WindowService {
    * 静态属性，存储 WindowService 类的单例实例。
    */
   private static _instance: WindowService;
+  private _logo = createLogo();
 
   /**
    * 存储所有窗口实例的对象，键为窗口名称，值为对应的 BrowserWindow 实例或 undefined。
@@ -75,6 +75,7 @@ class WindowService {
    * 使得主进程能够响应渲染进程发出的窗口操作请求。
    */
   private constructor() {
+    console.log('WindowService constructor', this._logo);
     this._setupEvents();
     logManager.info('Window service initialized');
   }
@@ -359,11 +360,13 @@ class WindowService {
    * @private
    */
   private _createWinInstance(name: WindowNames, opts?: BrowserWindowConstructorOptions) {
+
     return this._isHiddenWin(name)
       ? this._winStates[name].instance as BrowserWindow
       : new BrowserWindow({
         ...SHARE_WINDOW_OPTS,
         ...opts,
+        icon: this._logo,
       });
   }
 

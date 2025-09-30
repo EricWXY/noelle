@@ -1,4 +1,4 @@
-import { nativeImage, type NativeImage } from "electron";
+// import { nativeImage, type NativeImage } from "electron";
 import { CONFIG_KEYS } from "@common/constants";
 import configManager from "../service/ConfigService";
 import logManager from "../service/LogService";
@@ -27,11 +27,11 @@ export function createTranslator() {
   }
 }
 
-let logo: NativeImage | void;
+let logo: string | void;
 export function createLogo() {
   if (logo != null) {
     return logo;
   }
-  logo = nativeImage.createFromPath(path.join(__dirname, 'noel_icon.png'));
+  logo = path.join(__dirname, 'noel_icon.ico');
   return logo;
 }
