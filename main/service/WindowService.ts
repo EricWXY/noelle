@@ -356,17 +356,12 @@ class WindowService {
   private _setupWinLifecycle(win: BrowserWindow, name: WindowNames) {
     const updateWinStatus = debounce(() => !win?.isDestroyed()
       && win?.webContents?.send(IPC_EVENTS.WINDOW_MAXIMIZED, win?.isMaximized()), 80);
-    const onClose = () => {
-      this._winStates[name].instance = void 0;
-      this._winStates[name].isHidden = false;
-      this._checkAndCloseAllWindows();
-    }
-    win.on('close', onClose)
     win.once('closed', () => {
       win?.destroy();
       win?.removeListener('resize', updateWinStatus);
-      win?.removeListener('close', onClose);
       this._winStates[name].instance = void 0;
+      this._winStates[name].isHidden = false;
+      this._checkAndCloseAllWindows();
       logManager.info(`Window closed: ${name}`);
     });
     win.on('resize', updateWinStatus);
@@ -510,9 +505,12 @@ class WindowService {
    * @private
    */
   private _checkAndCloseAllWindows() {
-    if (!this._winStates[WINDOW_NAMES.MAIN].instance) {
-      Object.values(this._winStates).forEach(win => win?.instance?.close());
-    }
+    if (!this._winStates[WINDOW_NAMES.MAIN].instance || this._winStates[WINDOW_NAMES.MAIN].instance?.isDestroyed())
+      return Object.values(this._winStates).forEach(win => win?.instance?.close());
+
+    const minimizeToTray = configManager.get(CONFIG_KEYS.MINIMIZE_TO_TRAY);
+    if (!minimizeToTray && !this.get(WINDOW_NAMES.MAIN)?.isVisible())
+      return Object.values(this._winStates).forEach(win => !win?.instance?.isVisible() && win?.instance?.close());
   }
 
   /**
