@@ -274,6 +274,7 @@ class WindowService {
    * @returns 创建的窗口实例
    */
   public create(name: WindowNames, size: SizeOptions, moreOpts?: BrowserWindowConstructorOptions) {
+    if (this.get(name)) return;
     const isHiddenWin = this._isHiddenWin(name);
     let win = this._createWinInstance(name, moreOpts);
 
