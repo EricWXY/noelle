@@ -110,7 +110,7 @@ const registerShortcuts = (window: BrowserWindow) => {
       return onClose();
 
     if (input.code === 'Enter' && input.modifiers.includes('control'))
-      window.webContents.send(IPC_EVENTS.SHORTCUT_CALLED + SHORTCUT_KEYS.SEND_MESSAGE);
+      window?.webContents.send(IPC_EVENTS.SHORTCUT_CALLED + SHORTCUT_KEYS.SEND_MESSAGE);
   });
 }
 

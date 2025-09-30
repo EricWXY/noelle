@@ -93,11 +93,11 @@ class WindowService {
   private _setupEvents() {
     const handleCloseWindow = (e: IpcMainEvent) => {
       const target = BrowserWindow.fromWebContents(e.sender);
-      const winName = this.getName(target)
+      const winName = this.getName(target);
       this.close(target, this._isReallyClose(winName));
     }
     const handleMinimizeWindow = (e: IpcMainEvent) => {
-      BrowserWindow.fromWebContents(e.sender)?.minimize()
+      BrowserWindow.fromWebContents(e.sender)?.minimize();
     }
     const handleMaximizeWindow = (e: IpcMainEvent) => {
       this.toggleMax(BrowserWindow.fromWebContents(e.sender));
@@ -274,7 +274,9 @@ class WindowService {
     const isHiddenWin = this._isHiddenWin(name);
     let win = this._createWinInstance(name, moreOpts);
 
-    !isHiddenWin && this._setupWinLifecycle(win, name);
+    !isHiddenWin && this
+      ._setupWinLifecycle(win, name)
+      ._loadWindowTemplate(win, name);
 
     const duration = name === WINDOW_NAMES.MAIN ? 800 : 600;
 
@@ -354,15 +356,21 @@ class WindowService {
   private _setupWinLifecycle(win: BrowserWindow, name: WindowNames) {
     const updateWinStatus = debounce(() => !win?.isDestroyed()
       && win?.webContents?.send(IPC_EVENTS.WINDOW_MAXIMIZED, win?.isMaximized()), 80);
-    // win.on('')
+    const onClose = () => {
+      this._winStates[name].instance = void 0;
+      this._winStates[name].isHidden = false;
+      this._checkAndCloseAllWindows();
+    }
+    win.on('close', onClose)
     win.once('closed', () => {
       win?.destroy();
-      win?.removeAllListeners('resize');
+      win?.removeListener('resize', updateWinStatus);
+      win?.removeListener('close', onClose);
       this._winStates[name].instance = void 0;
       logManager.info(`Window closed: ${name}`);
     });
-    win.on('resize', updateWinStatus)
-    this._loadWindowTemplate(win, name);
+    win.on('resize', updateWinStatus);
+    return this;
   }
 
   /**

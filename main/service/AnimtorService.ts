@@ -127,14 +127,14 @@ export class AnimtorService {
       };
 
       // 若窗口未被销毁，则更新窗口的边界和透明度
-      if (!this.window.isDestroyed()) {
-        this.window.setBounds({
+      if (this.window && !this.window?.isDestroyed()) {
+        this.window?.setBounds({
           x: Math.round(currentValues.x),
           y: Math.round(currentValues.y),
           width: Math.round(currentValues.width),
           height: Math.round(currentValues.height)
         });
-        this.window.setOpacity(currentValues.opacity);
+        this.window?.setOpacity(currentValues.opacity);
       }
 
       // 若动画未完成，则继续下一帧动画；否则停止动画

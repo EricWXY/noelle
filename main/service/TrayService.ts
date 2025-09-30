@@ -1,4 +1,4 @@
-import { Tray, Menu, ipcMain, type BrowserWindow, } from 'electron';
+import { Tray, Menu, ipcMain, app, type BrowserWindow, } from 'electron';
 import { createTranslator, createLogo } from '../utils';
 import { MAIN_WIN_SIZE, IPC_EVENTS, WINDOW_NAMES, CONFIG_KEYS } from '@common/constants';
 import logManager from './LogService';
@@ -34,9 +34,10 @@ export class TrayService {
    */
   public create() {
     if (this._tray) return;
-
     this._updateTray();
-    this._window.on('closed', () => this.destroy());
+    app.on('quit', () => {
+      this.destroy();
+    })
   }
 
   /**
@@ -48,10 +49,8 @@ export class TrayService {
     }
 
     const showWindow = () => {
-      if (this._window?.isVisible()) {
-        this._window.focus();
-        return
-      }
+      if (!this._window?.isDestroyed() && this._window?.isVisible())
+        return this._window?.focus();
       windowManager.create(WINDOW_NAMES.MAIN, MAIN_WIN_SIZE);
     };
 

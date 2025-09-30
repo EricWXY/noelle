@@ -160,7 +160,7 @@ export class ShortcutService {
     window: BrowserWindow,
     callback: (input: Electron.Input) => boolean | void
   ) {
-    window.webContents.on('before-input-event', (e, input) => {
+    window?.webContents?.on('before-input-event', (e, input) => {
       if (!window.isFocused()) return;
       if ((input.type === 'keyDown' && callback(input)) === true)
         e.preventDefault();
