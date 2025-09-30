@@ -55,7 +55,7 @@ export const providers: Provider[] = [
 ];
 
 
-export const dataBase = new Dexie('noel') as Dexie & {
+export const dataBase = new Dexie('noelle') as Dexie & {
   providers: EntityTable<Provider, 'id'>;
   conversations: EntityTable<Conversation, 'id'>;
   messages: EntityTable<Message, 'id'>;

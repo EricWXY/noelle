@@ -4,7 +4,7 @@ const { FuseV1Options, FuseVersion } = require('@electron/fuses');
 
 module.exports = {
   packagerConfig: {
-    name: 'noelle',
+    name: 'Noelle',
     icon: '/public/noel_icon',
     asar: true,
   },
