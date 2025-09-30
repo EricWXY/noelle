@@ -95,44 +95,43 @@ const registerMenus = (window: BrowserWindow) => {
     },
   ])
 }
+const destroyMenus = () => {
+  menuManager.destroyMenu(MENU_IDS.CONVERSATION_ITEM);
+  menuManager.destroyMenu(MENU_IDS.CONVERSATION_LIST);
+  menuManager.destroyMenu(MENU_IDS.MSSAGE_ITEM);
+}
 
 const registerShortcuts = (window: BrowserWindow) => {
-  const onClose = () => {
-    const isReallyClose = configManager.get(CONFIG_KEYS.MINIMIZE_TO_TRAY) === false;
-    windowManager.close(window, isReallyClose);
-    return true; // e.preventDefault()
-  }
   shortcutManager.registerForWindow(window, (input) => {
-    if ((input.key === 'F4' && input.alt) && (process.platform !== 'darwin'))
-      return onClose();
-
-    if (input.code === 'KeyW' && input.modifiers.includes('control'))
-      return onClose();
-
     if (input.code === 'Enter' && input.modifiers.includes('control'))
       window?.webContents.send(IPC_EVENTS.SHORTCUT_CALLED + SHORTCUT_KEYS.SEND_MESSAGE);
   });
 }
 
 export async function setupMainWindow() {
-  const mainWindow = windowManager.create(WINDOW_NAMES.MAIN, MAIN_WIN_SIZE);
+  windowManager.onWindowCreate(WINDOW_NAMES.MAIN, (mainWindow) => {
 
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools();
-
-  let minimizeToTray = configManager.get(CONFIG_KEYS.MINIMIZE_TO_TRAY);
-  configManager.onConfigChange((config) => {
-    if (minimizeToTray === config[CONFIG_KEYS.MINIMIZE_TO_TRAY]) return;
-    minimizeToTray = config[CONFIG_KEYS.MINIMIZE_TO_TRAY];
+    let minimizeToTray = configManager.get(CONFIG_KEYS.MINIMIZE_TO_TRAY);
+    configManager.onConfigChange((config) => {
+      if (minimizeToTray === config[CONFIG_KEYS.MINIMIZE_TO_TRAY]) return;
+      minimizeToTray = config[CONFIG_KEYS.MINIMIZE_TO_TRAY];
+      handleTray(minimizeToTray, mainWindow);
+    });
     handleTray(minimizeToTray, mainWindow);
-  });
-  handleTray(minimizeToTray, mainWindow);
-
-  registerMenus(mainWindow);
-  registerShortcuts(mainWindow);
+    registerMenus(mainWindow);
+    registerShortcuts(mainWindow);
+  })
+  windowManager.onWindowClose(WINDOW_NAMES.MAIN, () => {
+    destroyMenus();
+  })
+  windowManager.create(WINDOW_NAMES.MAIN, MAIN_WIN_SIZE);
 
   ipcMain.on(IPC_EVENTS.START_A_DIALOGUE, async (_event, props: CreateDialogueProps) => {
     const { providerName, messages, messageId, selectedModel } = props
+    const mainWindow = windowManager.get(WINDOW_NAMES.MAIN);
+    if (!mainWindow) {
+      throw new Error('main window not found');
+    }
     try {
       const provider = createProvider(providerName);
       const chunks = await provider?.chat(messages, selectedModel);

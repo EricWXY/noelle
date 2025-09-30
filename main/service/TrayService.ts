@@ -37,6 +37,7 @@ export class TrayService {
     this._updateTray();
     app.on('quit', () => {
       this.destroy();
+      shortcutManager.unregister('tray.showWindow');
     })
   }
 

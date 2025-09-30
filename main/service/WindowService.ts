@@ -4,6 +4,7 @@ import { WINDOW_NAMES, IPC_EVENTS, CONFIG_KEYS } from '@common/constants';
 import { debounce } from '@common/utils';
 import { createLogo } from '../utils';
 import { EasingFunctions, createAnimator, AnimtorService } from './AnimtorService';
+import shortcutManager from './ShortcutService';
 import configManager from './ConfigService';
 import themeManager from './ThemeService';
 import path from 'node:path';
@@ -44,6 +45,8 @@ const SHARE_WINDOW_OPTS = {
 interface WindowState {
   instance: BrowserWindow | void;
   isHidden: boolean;
+  onCreate: ((window: BrowserWindow) => void)[];
+  onClosed: ((window: BrowserWindow) => void)[];
   status?: string
 }
 
@@ -60,9 +63,9 @@ class WindowService {
    * 存储所有窗口实例的对象，键为窗口名称，值为对应的 BrowserWindow 实例或 undefined。
    */
   private _winStates: Record<WindowNames | string, WindowState> = {
-    main: { instance: void 0, isHidden: false },
-    setting: { instance: void 0, isHidden: false },
-    dialog: { instance: void 0, isHidden: false },
+    main: { instance: void 0, isHidden: false, onCreate: [], onClosed: [] },
+    setting: { instance: void 0, isHidden: false, onCreate: [], onClosed: [] },
+    dialog: { instance: void 0, isHidden: false, onCreate: [], onClosed: [] },
   };
 
   /**
@@ -295,8 +298,11 @@ class WindowService {
       size
     });
 
+    this._handleWindowShortcuts(win);
+
     if (!isHiddenWin) {
       this._winStates[name].instance = win;
+      this._winStates[name].onCreate.forEach(callback => callback(win));
       logManager.info(`Window created: ${name}, size: ${size.width}x${size.height}`);
     }
 
@@ -305,20 +311,33 @@ class WindowService {
       logManager.info(`Hidden window shown: ${name}`);
     }
 
-    // 禁用打开开发者工具快捷键(ctrl+shift+I)
-    if (app.isPackaged) {
-      win.webContents.on('before-input-event', (e, input) => {
-        if (!win.isFocused()) return;
-        if (
-          input.type === 'keyDown' &&
-          input.code === 'KeyI' &&
-          input.modifiers.includes('control') &&
-          input.modifiers.includes('shift')
-        ) e.preventDefault();
-      })
-    }
-
+    // 触发窗口创建回调
     return win;
+  }
+
+  private _handleWindowShortcuts(win: BrowserWindow) {
+    const isPackaged = app.isPackaged;
+
+    const proxyCloseEvent = () => {
+      this.close(win, this._isReallyClose(this.getName(win)))
+      return true;
+    }
+    shortcutManager.registerForWindow(win, (input) => {
+      // 代理关闭快捷键
+      if ((input.key === 'F4' && input.alt) && (process.platform !== 'darwin'))
+        return proxyCloseEvent();
+      if (input.code === 'KeyW' && input.modifiers.includes('control'))
+        return proxyCloseEvent();
+
+      if (!isPackaged) return;
+      // 禁用打开开发者工具快捷键(ctrl+shift+I)
+      if (
+        input.type === 'keyDown' &&
+        input.code === 'KeyI' &&
+        input.modifiers.includes('control') &&
+        input.modifiers.includes('shift')
+      ) return true;
+    })
   }
 
   /**
@@ -357,6 +376,7 @@ class WindowService {
     const updateWinStatus = debounce(() => !win?.isDestroyed()
       && win?.webContents?.send(IPC_EVENTS.WINDOW_MAXIMIZED, win?.isMaximized()), 80);
     win.once('closed', () => {
+      this._winStates[name].onClosed.forEach(callback => callback(win));
       win?.destroy();
       win?.removeListener('resize', updateWinStatus);
       this._winStates[name].instance = void 0;
@@ -553,6 +573,24 @@ class WindowService {
     for (const [name, win] of Object.entries(this._winStates) as [WindowNames, { instance: BrowserWindow | void } | void][]) {
       if (win?.instance === target) return name;
     }
+  }
+
+  /**
+   * 注册窗口创建回调
+   * @param name 窗口名称
+   * @param callback 窗口创建回调函数
+   */
+  public onWindowCreate(name: WindowNames, callback: (window: BrowserWindow) => void) {
+    this._winStates[name].onCreate.push(callback);
+  }
+
+  /**
+   * 注册窗口关闭回调
+   * @param name 窗口名称
+   * @param callback 窗口关闭回调函数
+   */
+  public onWindowClose(name: WindowNames, callback: (window: BrowserWindow) => void) {
+    this._winStates[name].onClosed.push(callback);
   }
 }
 
