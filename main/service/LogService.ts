@@ -1,15 +1,14 @@
+import { IPC_EVENTS } from '@common/constants';
 import { promisify } from 'util';
 import { app, ipcMain } from 'electron';
 import log from 'electron-log';
 import * as path from 'path';
 import * as fs from 'fs';
-import { IPC_EVENTS } from '@common/constants';
 
 // 转换为Promise形式的fs方法
 const readdirAsync = promisify(fs.readdir);
 const statAsync = promisify(fs.stat);
 const unlinkAsync = promisify(fs.unlink);
-// const mkdirAsync = promisify(fs.mkdir);
 
 /**
  * 日志服务类，用于管理应用程序的日志记录功能

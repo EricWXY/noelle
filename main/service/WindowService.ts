@@ -75,7 +75,6 @@ class WindowService {
    * 使得主进程能够响应渲染进程发出的窗口操作请求。
    */
   private constructor() {
-    console.log('WindowService constructor', this._logo);
     this._setupEvents();
     logManager.info('Window service initialized');
   }
